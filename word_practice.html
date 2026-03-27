@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>互動語言練習</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; background: #f7f7f7; }
+        #quiz-container { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        .target-image { width: 200px; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 20px; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { padding: 15px; font-size: 18px; border: 2px solid #e5e5e5; border-radius: 12px; background: white; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #f0f0f0; }
+        .correct { background: #d7ffb8 !important; border-color: #58cc02 !important; color: #58cc02; }
+        .wrong { background: #ffdfe0 !important; border-color: #ff4b4b !important; color: #ff4b4b; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <h2 id="question-text">選出正確的單字</h2>
+    <img id="main-image" class="target-image" src="" alt="題目圖片">
+    <div id="options" class="options-grid"></div>
+    <p id="feedback"></p>
+</div>
+
+<script>
+    // 1. 題目資料
+    const questions = [
+        { image: "https://images.unsplash.com/photo-1557800636-894a64c1696f?w=300", answer: "Apple", options: ["Apple", "Banana", "Cherry", "Date"] },
+        { image: "https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=300", answer: "Cherry", options: ["Grape", "Melon", "Cherry", "Apple"] }
+    ];
+
+    let currentIndex = 0;
+
+    // 2. 渲染函數
+    function loadQuestion() {
+        const q = questions[currentIndex];
+        document.getElementById("main-image").src = q.image;
+        const optionsDiv = document.getElementById("options");
+        optionsDiv.innerHTML = "";
+        document.getElementById("feedback").innerText = "";
+
+        q.options.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, btn);
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    // 3. 判斷邏輯
+    function checkAnswer(choice, btn) {
+        const q = questions[currentIndex];
+        const allButtons = document.querySelectorAll("button");
+        allButtons.forEach(b => b.disabled = true); // 防止重複點擊
+
+        if (choice === q.answer) {
+            btn.classList.add("correct");
+            document.getElementById("feedback").innerText = "太棒了！✨";
+            setTimeout(nextQuestion, 1500);
+        } else {
+            btn.classList.add("wrong");
+            document.getElementById("feedback").innerText = `不對喔，答案是 ${q.answer}`;
+            setTimeout(nextQuestion, 2000);
+        }
+    }
+
+    function nextQuestion() {
+        currentIndex = (currentIndex + 1) % questions.length;
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
