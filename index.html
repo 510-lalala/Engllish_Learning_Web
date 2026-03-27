@@ -12,6 +12,9 @@
         button:hover { background: #f0f0f0; }
         .correct { background: #d7ffb8 !important; border-color: #58cc02 !important; color: #58cc02; }
         .wrong { background: #ffdfe0 !important; border-color: #ff4b4b !important; color: #ff4b4b; }
+        #submit-btn {padding: 15px;font-size: 18px;font-weight: bold;border-radius: 12px;cursor: pointer;transition: all 0.2s;}
+        /* 當按鈕是 disabled 時的顏色 */
+        #submit-btn:disabled {background-color: #e5e5e5 !important;color: #afafaf !important;cursor: not-allowed;}
     </style>
 </head>
 <body>
@@ -20,65 +23,85 @@
     <h2 id="question-text">選出正確的單字</h2>
     <img id="main-image" class="target-image" src="" alt="題目圖片">
     <div id="options" class="options-grid"></div>
+    <button id="submit-btn" style="margin-top: 20px; width: 100%; background-color: #1cb0f6; color: white; border: none;" disabled>確認</button>
+    
     <p id="feedback"></p>
 </div>
 
 <script>
-    const questions = [
-    { image: "./images/broken_arm.jpg", answer: "Broken Arm", options: ["Broken Arm", "Cough", "Fever", "Cold"] },
-    { image: "./images/cough.jpg", answer: "Cough", options: ["Headache", "Cough", "Stomachache", "Runny Nose"] }
-];
-
-// --- 1. 洗牌函數 (Fisher-Yates) ---
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
 let currentIndex = 0;
-shuffle(questions); // 網頁一載入先洗牌題目
+let selectedOption = null; // 用來記錄目前選了什麼
+let selectedBtn = null;    // 用來記錄目前點了哪個按鈕元件
+
+// ... (questions 陣列和 shuffle 函數保持不變) ...
 
 function loadQuestion() {
     const q = questions[currentIndex];
-    // 選項也洗牌一下，讓正確答案不會總是在同一個位置
     shuffle(q.options); 
-
     document.getElementById("main-image").src = q.image;
+    document.getElementById("feedback").innerText = "";
+    
+    // 重設狀態
+    selectedOption = null;
+    selectedBtn = null;
+    const submitBtn = document.getElementById("submit-btn");
+    submitBtn.disabled = true; // 未選擇前不能點確認
+    submitBtn.innerText = "確認提交";
+
     const optionsDiv = document.getElementById("options");
     optionsDiv.innerHTML = "";
-    document.getElementById("feedback").innerText = "";
 
     q.options.forEach(opt => {
         const btn = document.createElement("button");
         btn.innerText = opt;
-        btn.onclick = () => checkAnswer(opt, btn);
+        // 點擊選項按鈕的行為
+        btn.onclick = () => selectOption(opt, btn);
         optionsDiv.appendChild(btn);
     });
 }
 
-function checkAnswer(choice, btn) {
-    const q = questions[currentIndex];
-    
-    // --- 2. 語音朗讀功能 ---
+// 步驟 A：選擇按鈕 (發音 + 變色)
+function selectOption(choice, btn) {
+    // 1. 發音
     const msg = new SpeechSynthesisUtterance(choice);
-    msg.lang = 'en-US'; // 唸出你點擊的那個字
+    msg.lang = 'en-US';
     window.speechSynthesis.speak(msg);
 
-    const allButtons = document.querySelectorAll("button");
-    allButtons.forEach(b => b.disabled = true);
+    // 2. 移除所有按鈕的「選中」樣式
+    const allButtons = document.querySelectorAll("#options button");
+    allButtons.forEach(b => b.style.borderColor = "#e5e5e5");
+    allButtons.forEach(b => b.style.backgroundColor = "white");
 
-    if (choice === q.answer) {
-        btn.classList.add("correct");
+    // 3. 設定目前選中的樣式 (例如變成淡藍色)
+    btn.style.borderColor = "#1cb0f6";
+    btn.style.backgroundColor = "#ddf4ff";
+
+    // 4. 更新狀態
+    selectedOption = choice;
+    selectedBtn = btn;
+    document.getElementById("submit-btn").disabled = false; // 開啟確認按鈕
+}
+
+// 步驟 B：按下確認按鈕後的邏輯
+document.getElementById("submit-btn").onclick = function() {
+    const q = questions[currentIndex];
+    const submitBtn = this;
+    
+    // 禁用所有按鈕，防止判斷中亂點
+    const allButtons = document.querySelectorAll("#options button");
+    allButtons.forEach(b => b.disabled = true);
+    submitBtn.disabled = true;
+
+    if (selectedOption === q.answer) {
+        selectedBtn.classList.add("correct");
         document.getElementById("feedback").innerText = "太棒了！✨";
         setTimeout(nextQuestion, 1500);
     } else {
-        btn.classList.add("wrong");
+        selectedBtn.classList.add("wrong");
         document.getElementById("feedback").innerText = `不對喔，正確答案是 ${q.answer}`;
         setTimeout(nextQuestion, 2000);
     }
-}
+};
 
 function nextQuestion() {
     currentIndex = (currentIndex + 1) % questions.length;
