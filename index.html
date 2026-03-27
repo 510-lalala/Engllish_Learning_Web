@@ -33,30 +33,6 @@
 const correctSound = new Audio('./sound/correct.mp3');
 const wrongSound = new Audio('./sound/wrong.mp3');
 
-document.getElementById("submit-btn").onclick = function() {
-    const q = questions[currentIndex];
-    const submitBtn = this;
-    
-    const allButtons = document.querySelectorAll("#options button");
-    allButtons.forEach(b => b.disabled = true);
-    submitBtn.disabled = true;
-
-    if (selectedOption === q.answer) {
-        // --- 播放正確音效 ---
-        correctSound.play(); 
-        
-        selectedBtn.classList.add("correct");
-        document.getElementById("feedback").innerText = "太棒了！✨";
-        setTimeout(nextQuestion, 1500);
-    } else {
-        // --- 播放錯誤音效 ---
-        wrongSound.play(); 
-
-        selectedBtn.classList.add("wrong");
-        document.getElementById("feedback").innerText = `不對喔，正確答案是 ${q.answer}`;
-        setTimeout(nextQuestion, 2000);
-    }
-};
 const questions = [
         { image: "https://images.unsplash.com/photo-1557800636-894a64c1696f?w=300", answer: "Apple", options: ["Apple", "Banana", "Cherry", "Date"] },
         { image: "https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=300", answer: "Cherry", options: ["Grape", "Melon", "Cherry", "Apple"] }
@@ -121,22 +97,25 @@ function selectOption(choice, btn) {
     selectedBtn = btn;
     document.getElementById("submit-btn").disabled = false; // 開啟確認按鈕
 }
-
-// 步驟 B：按下確認按鈕後的邏輯
 document.getElementById("submit-btn").onclick = function() {
     const q = questions[currentIndex];
     const submitBtn = this;
     
-    // 禁用所有按鈕，防止判斷中亂點
     const allButtons = document.querySelectorAll("#options button");
     allButtons.forEach(b => b.disabled = true);
     submitBtn.disabled = true;
 
     if (selectedOption === q.answer) {
+        // --- 播放正確音效 ---
+        correctSound.play(); 
+        
         selectedBtn.classList.add("correct");
         document.getElementById("feedback").innerText = "太棒了！✨";
         setTimeout(nextQuestion, 1500);
     } else {
+        // --- 播放錯誤音效 ---
+        wrongSound.play(); 
+
         selectedBtn.classList.add("wrong");
         document.getElementById("feedback").innerText = `不對喔，正確答案是 ${q.answer}`;
         setTimeout(nextQuestion, 2000);
