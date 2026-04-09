@@ -1,6 +1,6 @@
-"# Engllish_Learning_Web" 
-先用了個純前端的ui測試功能
-短期目標：   
+"# Engllish_Learning_Web"   
+先用了個純前端的ui測試功能  
+check短期目標(已實現)：   
 加入不同功能（ex聽聲音選單字、拼字.  
 串接不同功能之網頁.  
 
