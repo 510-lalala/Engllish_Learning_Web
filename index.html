@@ -2,133 +2,520 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>互動語言練習</title>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; background: #f7f7f7; }
-        #quiz-container { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        .target-image { width: 200px; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 20px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; background: #f7f7f7; min-height: 100vh; }
+
+        /* ── 共用容器 ── */
+        #app { width: 100%; max-width: 480px; }
+
+        /* ── 首頁 ── */
+        #home-screen { background: white; padding: 36px 24px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; }
+        .home-logo  { font-size: 52px; margin-bottom: 10px; }
+        .home-title { font-size: 26px; font-weight: 700; color: #333; margin-bottom: 6px; }
+        .home-sub   { font-size: 15px; color: #999; margin-bottom: 32px; }
+        .mode-btn   { display: block; width: 100%; padding: 20px; margin-bottom: 14px; border: none; border-radius: 16px;
+                      font-size: 20px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
+        .mode-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
+        .btn-vocab   { background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; }
+        .btn-grammar { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
+
+        /* ── 子選單 ── */
+        #sub-screen { background: white; padding: 28px 24px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; display: none; }
+        .sub-icon  { font-size: 48px; margin-bottom: 10px; }
+        .sub-title { font-size: 22px; font-weight: 700; color: #333; margin-bottom: 8px; }
+        .sub-desc  { font-size: 14px; color: #888; line-height: 1.6; margin-bottom: 14px; }
+        .tag-row   { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+        .tag { background: #f0f4ff; color: #4a6cf7; font-size: 12px; padding: 4px 12px; border-radius: 20px; border: 1px solid #d0daff; }
+        .sub-btns  { display: flex; gap: 12px; }
+        .btn-start  { flex: 1; padding: 16px; background: #1cb0f6; color: white; border: none; border-radius: 14px; font-size: 18px; font-weight: 700; cursor: pointer; }
+        .btn-start:hover { opacity: 0.88; }
+        .btn-return { padding: 16px 20px; background: white; color: #888; border: 2px solid #e5e5e5; border-radius: 14px; font-size: 16px; cursor: pointer; }
+        .btn-return:hover { background: #f5f5f5; }
+
+        /* ── 測驗區 ── */
+        #quiz-container { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: none; }
+        .quiz-topbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+        .back-link   { background: none; border: 1.5px solid #ddd; border-radius: 10px; padding: 6px 12px; font-size: 13px; cursor: pointer; color: #888; }
+        .mode-label  { font-size: 13px; font-weight: 600; color: #4a6cf7; }
+        .progress-wrap { background: #e5e5e5; height: 12px; border-radius: 10px; margin-bottom: 6px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #58cc02; border-radius: 10px; transition: width 0.3s; }
+        .q-counter   { font-size: 13px; color: #aaa; text-align: right; margin-bottom: 14px; }
+
+        .type-badge  { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 12px;
+                       border-radius: 20px; margin-bottom: 10px; }
+        .badge-choice   { background: #e8f5ff; color: #1cb0f6; }
+        .badge-spelling { background: #fff3e0; color: #e67e00; }
+        .badge-sentence { background: #f0fff4; color: #27ae60; }
+        .badge-grammar  { background: #f3e8ff; color: #8e44ad; }
+
+        #question-type-text { font-size: 16px; color: #999; margin-bottom: 5px; }
+        #sentence-hint { font-size: 21px; font-weight: bold; margin-bottom: 15px; min-height: 56px; line-height: 1.5; color: #333; }
+        .highlight { color: #1cb0f6; }
+        .tense-tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 12px; margin-bottom: 8px; }
+        .t-present-simple   { background: #e0f7fa; color: #00796b; }
+        .t-present-cont     { background: #e8f5e9; color: #2e7d32; }
+        .t-past-simple      { background: #fff8e1; color: #f57f17; }
+        .t-past-cont        { background: #fce4ec; color: #c62828; }
+
+        .target-image { width: 260px; height: 195px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; border: 1px solid #ddd; display: block; margin-left: auto; margin-right: auto; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        button { padding: 15px; font-size: 18px; border: 2px solid #e5e5e5; border-radius: 12px; background: white; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #f0f0f0; }
-        .correct { background: #d7ffb8 !important; border-color: #58cc02 !important; color: #58cc02; }
-        .wrong { background: #ffdfe0 !important; border-color: #ff4b4b !important; color: #ff4b4b; }
-        #submit-btn {padding: 15px;font-size: 18px;font-weight: bold;border-radius: 12px;cursor: pointer;transition: all 0.2s;}
-        /* 當按鈕是 disabled 時的顏色 */
-        #submit-btn:disabled {background-color: #e5e5e5 !important;color: #afafaf !important;cursor: not-allowed;}
+        .options-grid.single-col { grid-template-columns: 1fr; }
+        button.opt { padding: 14px; font-size: 17px; border: 2px solid #e5e5e5; border-radius: 12px; background: white; cursor: pointer; transition: 0.15s; line-height: 1.3; }
+        button.opt:hover:not(:disabled) { background: #f0f0f0; }
+        .correct { background: #d7ffb8 !important; border-color: #58cc02 !important; color: #3a8c00; }
+        .wrong   { background: #ffdfe0 !important; border-color: #ff4b4b !important; color: #cc0000; }
+
+        #input-zone { display: none; margin-top: 10px; }
+        #user-input { width: 100%; padding: 15px; font-size: 18px; border-radius: 10px; border: 2px solid #ddd; text-align: center; }
+        #user-input:focus { outline: none; border-color: #1cb0f6; }
+
+        #submit-btn { padding: 15px; font-size: 18px; font-weight: bold; border-radius: 12px; cursor: pointer;
+                      width: 100%; margin-top: 16px; background-color: #1cb0f6; color: white; border: none; }
+        #submit-btn:disabled { background-color: #e5e5e5 !important; color: #afafaf !important; cursor: not-allowed; }
+        #feedback { font-weight: bold; margin-top: 10px; min-height: 24px; font-size: 16px; text-align: center; }
+
+        /* ── 結果頁 ── */
+        #result-zone { display: none; text-align: center; padding: 10px 0; }
+        .result-emoji { font-size: 60px; margin-bottom: 10px; }
+        .result-score { font-size: 46px; font-weight: 700; color: #1cb0f6; margin: 8px 0 4px; }
+        .result-msg   { font-size: 16px; color: #555; margin-bottom: 20px; }
+        .result-btns  { display: flex; gap: 12px; }
     </style>
 </head>
 <body>
+<div id="app">
 
-<div id="quiz-container">
-    <h2 id="question-text">選出正確的單字</h2>
-    <img id="main-image" class="target-image" src="" alt="題目圖片">
-    <div id="options" class="options-grid"></div>
-    <button id="submit-btn" style="margin-top: 20px; width: 100%; background-color: #1cb0f6; color: white; border: none;" disabled>確認</button>
-    
-    <p id="feedback"></p>
-</div>
+    <!-- ① 首頁 -->
+    <div id="home-screen">
+        <div class="home-logo">🏥</div>
+        <div class="home-title">互動語言練習</div>
+        <div class="home-sub">選擇練習模式，開始學習！</div>
+        <button class="mode-btn btn-vocab"   onclick="goSub('vocab')">📖 單字練習</button>
+        <button class="mode-btn btn-grammar" onclick="goSub('grammar')">✏️ 文法練習</button>
+    </div>
+
+    <!-- ② 子選單 -->
+    <div id="sub-screen">
+        <div class="sub-icon"  id="sub-icon"></div>
+        <div class="sub-title" id="sub-title"></div>
+        <div class="sub-desc"  id="sub-desc"></div>
+        <div class="tag-row"   id="sub-tags"></div>
+        <div class="sub-btns">
+            <button class="btn-start"  onclick="startGame()">▶ Start</button>
+            <button class="btn-return" onclick="goHome()">Return</button>
+        </div>
+    </div>
+
+    <!-- ③ 測驗 -->
+    <div id="quiz-container">
+        <div class="quiz-topbar">
+            <button class="back-link" id="quiz-back-btn">← 返回</button>
+            <span class="mode-label" id="quiz-mode-label"></span>
+        </div>
+        <div class="progress-wrap">
+            <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+        <div class="q-counter" id="q-counter"></div>
+
+        <div id="game-zone">
+            <span class="type-badge" id="type-badge"></span>
+            <h2 id="question-type-text" style="font-size:16px;color:#999;margin-bottom:5px;"></h2>
+            <div id="tense-tag-wrap"></div>
+            <div id="sentence-hint"></div>
+            <img id="main-image" class="target-image" src="" alt="題目圖片" style="display:none">
+            <div id="options" class="options-grid"></div>
+            <div id="input-zone">
+                <input type="text" id="user-input" placeholder="Type the answer here..." autocomplete="off">
+            </div>
+            <button id="submit-btn" disabled>確認提交</button>
+            <p id="feedback"></p>
+        </div>
+
+        <div id="result-zone">
+            <div class="result-emoji" id="result-emoji"></div>
+            <div style="font-size:20px;font-weight:700;color:#333;">學習完成！</div>
+            <div class="result-score" id="result-score"></div>
+            <div class="result-msg"   id="result-msg"></div>
+            <div class="result-btns">
+                <button class="btn-start"  id="retry-btn">再試一次</button>
+                <button class="btn-return" onclick="goHome()">回首頁</button>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /app -->
 
 <script>
-// 在 script 最上方先宣告音效物件 (路徑請根據你的資料夾調整)
+// ═══════════════════════════════════════════════════
+// 單字題庫（醫療健康）
+// ═══════════════════════════════════════════════════
+const vocabBank = [
+    { image:"./image/ambulance.jpg",   answer:"Call an ambulance", noun:"ambulance",   sentenceNoun:"ambulance", symptom:"a broken arm", group:"action",  options:["Call an ambulance","Go to the doctor","Take medicine","Drink liquids"] },
+    { image:"./image/bandage.jpg",     answer:"Put on a bandage",  noun:"bandage",     sentenceNoun:"bandage",   symptom:"a bruise",     group:"action",  options:["Put on a bandage","Put ice on","Bruise","Get some rest"] },
+    { image:"./image/broken_arm.jpg",  answer:"Broken arm",        noun:"broken arm",                            symptom:"broken arm",   group:"symptom", options:["Broken arm","Headache","Fever","Cough"] },
+    { image:"./image/bruise.jpg",      answer:"Bruise",            noun:"bruise",                                symptom:"bruise",       group:"symptom", options:["Bruise","Cold","Put on a bandage","Take care of"] },
+    { image:"./image/care.jpg",        answer:"Take care of",      noun:"care",        sentenceNoun:"care",      symptom:"a cold",       group:"action",  options:["Take care of","Go to the doctor","Get some rest","Drink liquids"] },
+    { image:"./image/cold.jpg",        answer:"Cold",              noun:"cold",                                  symptom:"cold",         group:"symptom", options:["Cold","Runny nose","Cough","Fever"] },
+    { image:"./image/cough.jpg",       answer:"Cough",             noun:"cough",                                 symptom:"cough",        group:"symptom", options:["Cough","Headache","Stomachache","Cold"] },
+    { image:"./image/doctor.jpg",      answer:"Go to the doctor",  noun:"doctor",      sentenceNoun:"doctor",    symptom:"a fever",      group:"action",  options:["Go to the doctor","Take care of","Take medicine","Call an ambulance"] },
+    { image:"./image/fever.jpg",       answer:"Fever",             noun:"fever",                                 symptom:"fever",        group:"symptom", options:["Fever","Cold","Headache","Cough"] },
+    { image:"./image/headache.jpg",    answer:"Headache",          noun:"headache",                              symptom:"headache",     group:"symptom", options:["Headache","Stomachache","Fever","Broken arm"] },
+    { image:"./image/ice.jpg",         answer:"Put ice on",        noun:"ice",         sentenceNoun:"ice",       symptom:"a fever",      group:"action",  options:["Put ice on","Put on a bandage","Take medicine","Drink liquids"] },
+    { image:"./image/medicine.jpg",    answer:"Take medicine",     noun:"medicine",    sentenceNoun:"medicine",  symptom:"a headache",   group:"action",  options:["Take medicine","Drink liquids","Go to the doctor","Put ice on"] },
+    { image:"./image/rest.jpg",        answer:"Get some rest",     noun:"rest",        sentenceNoun:"rest",      symptom:"a cold",       group:"action",  options:["Get some rest","Take care of","Cold","Fever"] },
+    { image:"./image/runny_nose.jpg",  answer:"Runny nose",        noun:"runny nose",                            symptom:"runny nose",   group:"symptom", options:["Runny nose","Cough","Cold","Headache"] },
+    { image:"./image/stomachache.jpg", answer:"Stomachache",       noun:"stomachache",                           symptom:"stomachache",  group:"symptom", options:["Stomachache","Headache","Fever","Bruise"] },
+    { image:"./image/water.jpg",       answer:"Drink liquids",     noun:"liquids",     sentenceNoun:"liquids",   symptom:"a fever",      group:"action",  options:["Drink liquids","Take medicine","Put ice on","Get some rest"] }
+];
+
+// ═══════════════════════════════════════════════════
+// 文法題庫（四大時態）
+// ═══════════════════════════════════════════════════
+const grammarBank = [
+    // 現在簡單式
+    { tense:"present-simple",  tenseLabel:"現在簡單式", q:"She ___ to school every day.",                  answer:"goes",          options:["go","goes","going","went"] },
+    { tense:"present-simple",  tenseLabel:"現在簡單式", q:"The doctor ___ patients every morning.",         answer:"sees",          options:["see","sees","seeing","saw"] },
+    { tense:"present-simple",  tenseLabel:"現在簡單式", q:"I always ___ medicine when I have a headache.",  answer:"take",          options:["take","takes","taking","took"] },
+    { tense:"present-simple",  tenseLabel:"現在簡單式", q:"He ___ a runny nose every winter.",              answer:"gets",          options:["get","gets","getting","got"] },
+    { tense:"present-simple",  tenseLabel:"現在簡單式", q:"They ___ to the doctor together.",               answer:"go",            options:["go","goes","going","went"] },
+    { tense:"present-simple",  tenseLabel:"現在簡單式", q:"My mother always ___ care of me when I'm sick.", answer:"takes",         options:["take","takes","taking","took"] },
+
+    // 現在進行式
+    { tense:"present-cont",    tenseLabel:"現在進行式", q:"She ___ medicine right now.",                    answer:"is taking",     options:["takes","is taking","took","was taking"] },
+    { tense:"present-cont",    tenseLabel:"現在進行式", q:"Look! He ___ on a bandage.",                     answer:"is putting",    options:["puts","is putting","put","was putting"] },
+    { tense:"present-cont",    tenseLabel:"現在進行式", q:"The nurse ___ the patient at the moment.",       answer:"is helping",    options:["helps","is helping","helped","was helping"] },
+    { tense:"present-cont",    tenseLabel:"現在進行式", q:"They ___ for an ambulance now.",                 answer:"are calling",   options:["call","are calling","called","were calling"] },
+    { tense:"present-cont",    tenseLabel:"現在進行式", q:"I ___ some rest because I feel sick.",           answer:"am getting",    options:["get","am getting","got","was getting"] },
+    { tense:"present-cont",    tenseLabel:"現在進行式", q:"She ___ a lot because of her cold.",             answer:"is coughing",   options:["coughs","is coughing","coughed","was coughing"] },
+
+    // 過去簡單式
+    { tense:"past-simple",     tenseLabel:"過去簡單式", q:"She ___ a fever last night.",                    answer:"had",           options:["have","has","had","was having"] },
+    { tense:"past-simple",     tenseLabel:"過去簡單式", q:"He ___ to the doctor yesterday.",                answer:"went",          options:["go","goes","went","was going"] },
+    { tense:"past-simple",     tenseLabel:"過去簡單式", q:"I ___ medicine this morning.",                   answer:"took",          options:["take","takes","took","was taking"] },
+    { tense:"past-simple",     tenseLabel:"過去簡單式", q:"The ambulance ___ quickly to the hospital.",     answer:"arrived",       options:["arrive","arrives","arrived","was arriving"] },
+    { tense:"past-simple",     tenseLabel:"過去簡單式", q:"She ___ ice on her bruise after she fell.",      answer:"put",           options:["put","puts","was putting","is putting"] },
+    { tense:"past-simple",     tenseLabel:"過去簡單式", q:"They ___ care of their sick grandmother.",       answer:"took",          options:["take","takes","took","were taking"] },
+
+    // 過去進行式
+    { tense:"past-cont",       tenseLabel:"過去進行式", q:"She ___ medicine when I called her.",            answer:"was taking",    options:["took","takes","was taking","is taking"] },
+    { tense:"past-cont",       tenseLabel:"過去進行式", q:"He ___ a lot when the doctor arrived.",          answer:"was coughing",  options:["coughed","coughs","was coughing","is coughing"] },
+    { tense:"past-cont",       tenseLabel:"過去進行式", q:"They ___ for an ambulance when it started raining.", answer:"were calling", options:["called","call","were calling","are calling"] },
+    { tense:"past-cont",       tenseLabel:"過去進行式", q:"The nurse ___ the patient when I walked in.",    answer:"was helping",   options:["helped","helps","was helping","is helping"] },
+    { tense:"past-cont",       tenseLabel:"過去進行式", q:"I ___ some rest when my phone rang.",            answer:"was getting",   options:["got","get","was getting","am getting"] },
+    { tense:"past-cont",       tenseLabel:"過去進行式", q:"She ___ her broken arm when she screamed.",      answer:"was holding",   options:["held","holds","was holding","is holding"] },
+];
+
+// ═══════════════════════════════════════════════════
+// 狀態
+// ═══════════════════════════════════════════════════
+let appMode      = '';        // 'vocab' | 'grammar'
+let currentPool  = [];
+let totalRound   = 0;
+let correctCount = 0;
+let selectedOption = null;
+let questionMode = "choice"; // vocab 內部題型
+
 const correctSound = new Audio('./sound/correct.mp3');
-const wrongSound = new Audio('./sound/wrong.mp3');
+const wrongSound   = new Audio('./sound/wrong.mp3');
 
-const questions = [
-        { image: "https://images.unsplash.com/photo-1557800636-894a64c1696f?w=300", answer: "Apple", options: ["Apple", "Banana", "Cherry", "Date"] },
-        { image: "https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=300", answer: "Cherry", options: ["Grape", "Melon", "Cherry", "Apple"] }
-    ];
-// --- 1. 洗牌函數 (Fisher-Yates) ---
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
+// ═══════════════════════════════════════════════════
+// 畫面切換
+// ═══════════════════════════════════════════════════
+function showScreen(id) {
+    ['home-screen','sub-screen','quiz-container'].forEach(s =>
+        document.getElementById(s).style.display = 'none');
+    document.getElementById(id).style.display = 'block';
 }
 
-let currentIndex = 0;
-let selectedOption = null; // 用來記錄目前選了什麼
-let selectedBtn = null;    // 用來記錄目前點了哪個按鈕元件
+function goHome() { showScreen('home-screen'); }
 
-// ... (questions 陣列和 shuffle 函數保持不變) ...
-
-function loadQuestion() {
-    const q = questions[currentIndex];
-    shuffle(q.options); 
-    document.getElementById("main-image").src = q.image;
-    document.getElementById("feedback").innerText = "";
-    
-    // 重設狀態
-    selectedOption = null;
-    selectedBtn = null;
-    const submitBtn = document.getElementById("submit-btn");
-    submitBtn.disabled = true; // 未選擇前不能點確認
-    submitBtn.innerText = "確認提交";
-
-    const optionsDiv = document.getElementById("options");
-    optionsDiv.innerHTML = "";
-
-    q.options.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.innerText = opt;
-        // 點擊選項按鈕的行為
-        btn.onclick = () => selectOption(opt, btn);
-        optionsDiv.appendChild(btn);
-    });
-}
-
-// 步驟 A：選擇按鈕 (發音 + 變色)
-function selectOption(choice, btn) {
-    // 1. 發音
-    const msg = new SpeechSynthesisUtterance(choice);
-    msg.lang = 'en-US';
-    window.speechSynthesis.speak(msg);
-
-    // 2. 移除所有按鈕的「選中」樣式
-    const allButtons = document.querySelectorAll("#options button");
-    allButtons.forEach(b => b.style.borderColor = "#e5e5e5");
-    allButtons.forEach(b => b.style.backgroundColor = "white");
-
-    // 3. 設定目前選中的樣式 (例如變成淡藍色)
-    btn.style.borderColor = "#1cb0f6";
-    btn.style.backgroundColor = "#ddf4ff";
-
-    // 4. 更新狀態
-    selectedOption = choice;
-    selectedBtn = btn;
-    document.getElementById("submit-btn").disabled = false; // 開啟確認按鈕
-}
-document.getElementById("submit-btn").onclick = function() {
-    const q = questions[currentIndex];
-    const submitBtn = this;
-    
-    const allButtons = document.querySelectorAll("#options button");
-    allButtons.forEach(b => b.disabled = true);
-    submitBtn.disabled = true;
-
-    if (selectedOption === q.answer) {
-        // --- 播放正確音效 ---
-        correctSound.play(); 
-        
-        selectedBtn.classList.add("correct");
-        document.getElementById("feedback").innerText = "太棒了！✨";
-        setTimeout(nextQuestion, 1500);
+function goSub(mode) {
+    appMode = mode;
+    if (mode === 'vocab') {
+        document.getElementById('sub-icon').innerText  = '📖';
+        document.getElementById('sub-title').innerText = '單字練習';
+        document.getElementById('sub-desc').innerText  = '醫療健康主題單字，三種題型隨機混合：選擇題、拼字、句子填空。';
+        document.getElementById('sub-tags').innerHTML  =
+            '<span class="tag">選擇題</span><span class="tag">拼字</span><span class="tag">句子填空</span>';
     } else {
-        // --- 播放錯誤音效 ---
-        wrongSound.play(); 
-
-        selectedBtn.classList.add("wrong");
-        document.getElementById("feedback").innerText = `不對喔，正確答案是 ${q.answer}`;
-        setTimeout(nextQuestion, 2000);
+        document.getElementById('sub-icon').innerText  = '✏️';
+        document.getElementById('sub-title').innerText = '文法練習';
+        document.getElementById('sub-desc').innerText  = '四大時態選擇題，每題挑出正確的動詞形式。';
+        document.getElementById('sub-tags').innerHTML  =
+            '<span class="tag">現在簡單式</span><span class="tag">現在進行式</span><span class="tag">過去簡單式</span><span class="tag">過去進行式</span>';
     }
-};
+    document.getElementById('quiz-back-btn').onclick = () => goSub(mode);
+    showScreen('sub-screen');
+}
 
-function nextQuestion() {
-    currentIndex = (currentIndex + 1) % questions.length;
+// ═══════════════════════════════════════════════════
+// 遊戲啟動
+// ═══════════════════════════════════════════════════
+function startGame() {
+    const bank = appMode === 'vocab' ? vocabBank : grammarBank;
+    totalRound   = appMode === 'vocab' ? 16 : 10;
+    currentPool  = [...bank].sort(() => 0.5 - Math.random()).slice(0, totalRound);
+    correctCount = 0;
+
+    document.getElementById('quiz-mode-label').innerText = appMode === 'vocab' ? '📖 單字練習' : '✏️ 文法練習';
+    document.getElementById('progress-fill').style.width = '0%';
+    document.getElementById('game-zone').style.display   = 'block';
+    document.getElementById('result-zone').style.display = 'none';
+    document.getElementById('retry-btn').onclick = startGame;
+
+    showScreen('quiz-container');
     loadQuestion();
 }
 
-loadQuestion();
-</script>
+// ═══════════════════════════════════════════════════
+// 載入題目
+// ═══════════════════════════════════════════════════
+function loadQuestion() {
+    if (currentPool.length === 0) { showResult(); return; }
 
+    const done  = totalRound - currentPool.length;
+    document.getElementById('q-counter').innerText = `題目 ${done + 1} / ${totalRound}`;
+
+    // 重置
+    document.getElementById('feedback').innerText   = '';
+    document.getElementById('feedback').style.color = '#333';
+    document.getElementById('user-input').value     = '';
+    document.getElementById('user-input').oninput   = null;
+    document.getElementById('user-input').disabled  = false;
+    document.getElementById('submit-btn').disabled  = true;
+    document.getElementById('main-image').style.display = 'none';
+    document.getElementById('sentence-hint').innerHTML  = '';
+    document.getElementById('tense-tag-wrap').innerHTML = '';
+    document.getElementById('options').innerHTML        = '';
+    document.getElementById('input-zone').style.display = 'none';
+    selectedOption = null;
+
+    if (appMode === 'vocab') loadVocabQuestion();
+    else                     loadGrammarQuestion();
+}
+
+// ── 單字題 ──────────────────────────────────────────
+function loadVocabQuestion() {
+    const q       = currentPool[0];
+    const modes   = ["choice", "spelling", "sentence"];
+    questionMode  = modes[Math.floor(Math.random() * modes.length)];
+
+    document.getElementById('main-image').src          = q.image;
+    document.getElementById('main-image').style.display = 'block';
+
+    if (questionMode === "choice") {
+        setTypeBadge("選擇題", "badge-choice");
+        document.getElementById('question-type-text').innerText = '看圖，選出正確的答案';
+        renderOptions(q.options, q.answer);
+    }
+    else if (questionMode === "spelling") {
+        setTypeBadge("拼字題", "badge-spelling");
+        document.getElementById('question-type-text').innerText = '請拼出關鍵字（名詞）';
+        document.getElementById('sentence-hint').innerHTML = q.answer.replace(
+            new RegExp(q.noun, "gi"),
+            `<span class="highlight">${makeCloze(q.noun)}</span>`
+        );
+        showInput();
+    }
+    else {
+        setTypeBadge("句子填空", "badge-sentence");
+        document.getElementById('question-type-text').innerText = '完成填空';
+        if (q.group === "symptom") {
+            document.getElementById('sentence-hint').innerHTML =
+                `She has a <span class="highlight">${makeCloze(q.noun)}</span>. She should go to the doctor.`;
+        } else {
+            const actionWithBlank = q.answer.replace(
+                new RegExp("\\b" + q.sentenceNoun + "\\b", "gi"),
+                `<span class="highlight">${makeCloze(q.sentenceNoun)}</span>`
+            );
+            document.getElementById('sentence-hint').innerHTML =
+                `She has ${q.symptom}. She should ${actionWithBlank}.`;
+        }
+        showInput();
+    }
+}
+
+// ── 文法題 ──────────────────────────────────────────
+function loadGrammarQuestion() {
+    const q = currentPool[0];
+    setTypeBadge("文法選擇", "badge-grammar");
+    document.getElementById('question-type-text').innerText = '選出正確的動詞形式';
+
+    // 時態標籤
+    const tenseClassMap = {
+        'present-simple':'t-present-simple',
+        'present-cont':  't-present-cont',
+        'past-simple':   't-past-simple',
+        'past-cont':     't-past-cont'
+    };
+    const tenseEl = document.createElement('span');
+    tenseEl.className   = 'tense-tag ' + (tenseClassMap[q.tense] || '');
+    tenseEl.innerText   = q.tenseLabel;
+    document.getElementById('tense-tag-wrap').appendChild(tenseEl);
+
+    // 把 ___ 換成醒目樣式顯示問句
+    document.getElementById('sentence-hint').innerHTML =
+        q.q.replace('___', '<span class="highlight">___</span>');
+
+    renderOptions(q.options, q.answer, true);
+}
+
+// ═══════════════════════════════════════════════════
+// 共用 UI 工具
+// ═══════════════════════════════════════════════════
+function setTypeBadge(text, cls) {
+    const el = document.getElementById('type-badge');
+    el.innerText   = text;
+    el.className   = 'type-badge ' + cls;
+}
+
+function renderOptions(opts, answer, singleCol) {
+    const div = document.getElementById('options');
+    div.className = 'options-grid' + (singleCol ? ' single-col' : '');
+    div.innerHTML = '';
+    // 文法選項較長時自動切單欄
+    const maxLen = Math.max(...opts.map(o => o.length));
+    if (maxLen > 12) div.classList.add('single-col');
+
+    [...opts].sort(() => 0.5 - Math.random()).forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'opt';
+        btn.innerText = opt;
+        btn.onclick   = () => {
+            speak(opt);
+            document.querySelectorAll('.opt').forEach(b => {
+                b.style.backgroundColor = 'white';
+                b.style.borderColor     = '#e5e5e5';
+            });
+            btn.style.backgroundColor = '#ddf4ff';
+            btn.style.borderColor     = '#1cb0f6';
+            selectedOption = opt;
+            document.getElementById('submit-btn').disabled = false;
+        };
+        div.appendChild(btn);
+    });
+}
+
+function showInput() {
+    document.getElementById('input-zone').style.display = 'block';
+    const input = document.getElementById('user-input');
+    input.focus();
+    input.oninput = () => {
+        selectedOption = input.value.trim();
+        document.getElementById('submit-btn').disabled = selectedOption.length === 0;
+    };
+}
+
+function makeCloze(word) {
+    if (!word) return '';
+    return word.split(' ').map(w => w[0] + '_'.repeat(w.length - 1)).join(' ');
+}
+
+// ═══════════════════════════════════════════════════
+// 提交答案
+// ═══════════════════════════════════════════════════
+document.getElementById('submit-btn').onclick = function() {
+    const q       = currentPool[0];
+    const userAns = (selectedOption || '').toLowerCase().trim();
+    let isCorrect     = false;
+    let correctDisplay = '';
+
+    // 鎖定
+    document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+    document.getElementById('user-input').disabled = true;
+    this.disabled = true;
+
+    if (appMode === 'grammar') {
+        isCorrect      = userAns === q.answer.toLowerCase();
+        correctDisplay = q.answer;
+        // 標示選項顏色
+        document.querySelectorAll('.opt').forEach(b => {
+            if (b.innerText.toLowerCase() === q.answer.toLowerCase()) b.classList.add('correct');
+            else if (b.innerText === selectedOption)                  b.classList.add('wrong');
+        });
+    }
+    else if (questionMode === 'choice') {
+        isCorrect      = userAns === q.answer.toLowerCase();
+        correctDisplay = q.answer;
+        document.querySelectorAll('.opt').forEach(b => {
+            if (b.innerText.toLowerCase() === q.answer.toLowerCase()) b.classList.add('correct');
+            else if (b.innerText === selectedOption)                  b.classList.add('wrong');
+        });
+    }
+    else if (questionMode === 'spelling') {
+        isCorrect      = userAns === q.noun.toLowerCase();
+        correctDisplay = q.noun;
+    }
+    else { // sentence
+        const target   = (q.group === 'symptom') ? q.noun : q.sentenceNoun;
+        isCorrect      = userAns === target.toLowerCase();
+        correctDisplay = target;
+    }
+
+    const fb = document.getElementById('feedback');
+    if (isCorrect) {
+        correctSound.play().catch(() => {});
+        fb.innerText   = '太棒了！✨';
+        fb.style.color = '#58cc02';
+        currentPool.shift();
+        correctCount++;
+        updateProgress();
+        setTimeout(nextQ, 1500);
+    } else {
+        wrongSound.play().catch(() => {});
+        fb.innerText   = `不對喔，正確答案是: ${correctDisplay}`;
+        fb.style.color = '#ff4b4b';
+        let failed = currentPool.shift();
+        currentPool.push(failed);
+        setTimeout(nextQ, 2500);
+    }
+};
+
+function nextQ() {
+    document.getElementById('user-input').disabled = false;
+    loadQuestion();
+}
+
+function updateProgress() {
+    document.getElementById('progress-fill').style.width = (correctCount / totalRound * 100) + '%';
+}
+
+// ═══════════════════════════════════════════════════
+// 結果頁
+// ═══════════════════════════════════════════════════
+function showResult() {
+    const pct = Math.round(correctCount / totalRound * 100);
+    let emoji = '🎉', msg = '';
+    if      (pct === 100) { emoji = '🏆'; msg = '完美！全部答對，太厲害了！'; }
+    else if (pct >= 80)   { emoji = '🌟'; msg = '非常好！繼續保持！'; }
+    else if (pct >= 60)   { emoji = '👍'; msg = '不錯喔！再多練習幾次！'; }
+    else                  { emoji = '💪'; msg = '繼續努力，每次都有進步！'; }
+
+    document.getElementById('result-emoji').innerText = emoji;
+    document.getElementById('result-score').innerText = correctCount + ' / ' + totalRound;
+    document.getElementById('result-msg').innerText   = msg;
+    document.getElementById('progress-fill').style.width = '100%';
+    document.getElementById('game-zone').style.display   = 'none';
+    document.getElementById('result-zone').style.display = 'block';
+}
+
+// ═══════════════════════════════════════════════════
+// 語音
+// ═══════════════════════════════════════════════════
+function speak(text) {
+    try {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US';
+        window.speechSynthesis.speak(u);
+    } catch(e) {}
+}
+
+// 啟動首頁
+showScreen('home-screen');
+</script>
 </body>
 </html>
