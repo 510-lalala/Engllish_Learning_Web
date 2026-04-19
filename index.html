@@ -21,22 +21,20 @@
         .login-sub   { font-size: 14px; color: #999; margin-bottom: 28px; }
         .login-input { width: 100%; padding: 14px; font-size: 17px; border: 2px solid #e5e5e5; border-radius: 12px; text-align: center; margin-bottom: 10px; }
         .login-input:focus { outline: none; border-color: #1cb0f6; }
-        .login-select { width: 100%; padding: 14px; font-size: 17px; border: 2px solid #e5e5e5; border-radius: 12px; text-align: center; margin-bottom: 20px; background: white; }
-        .login-select:focus { outline: none; border-color: #1cb0f6; }
-        .btn-login { width: 100%; padding: 16px; background: #1cb0f6; color: white; border: none; border-radius: 14px; font-size: 18px; font-weight: 700; cursor: pointer; }
+        .btn-login { width: 100%; padding: 16px; background: #1cb0f6; color: white; border: none; border-radius: 14px; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 6px; }
         .btn-login:hover { opacity: 0.88; }
         .btn-login:disabled { background: #e5e5e5; color: #aaa; cursor: not-allowed; }
 
         /* ── 首頁 ── */
         #home-screen { background: white; padding: 36px 24px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; display: none; }
-        .home-logo   { font-size: 52px; margin-bottom: 10px; }
-        .home-title  { font-size: 26px; font-weight: 700; color: #333; margin-bottom: 6px; }
-        .home-sub    { font-size: 15px; color: #999; margin-bottom: 8px; }
-        .home-student{ font-size: 15px; color: #1cb0f6; font-weight: 600; margin-bottom: 28px; }
-        .mode-btn    { display: block; width: 100%; padding: 20px; margin-bottom: 14px; border: none; border-radius: 16px; font-size: 20px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
+        .home-logo    { font-size: 52px; margin-bottom: 10px; }
+        .home-title   { font-size: 26px; font-weight: 700; color: #333; margin-bottom: 6px; }
+        .home-sub     { font-size: 15px; color: #999; margin-bottom: 8px; }
+        .home-student { font-size: 15px; color: #1cb0f6; font-weight: 600; margin-bottom: 20px; }
+        .mode-btn     { display: block; width: 100%; padding: 20px; margin-bottom: 14px; border: none; border-radius: 16px; font-size: 20px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
         .mode-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
-        .btn-vocab   { background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; }
-        .btn-grammar { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
+        .btn-vocab    { background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; }
+        .btn-grammar  { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
 
         /* ── 子選單 ── */
         #sub-screen { background: white; padding: 28px 24px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; display: none; }
@@ -53,9 +51,15 @@
 
         /* ── 測驗區 ── */
         #quiz-container { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: none; }
-        .quiz-topbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+        .quiz-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .quiz-topbar-left { display: flex; align-items: center; gap: 10px; }
         .back-link   { background: none; border: 1.5px solid #ddd; border-radius: 10px; padding: 6px 12px; font-size: 13px; cursor: pointer; color: #888; }
         .mode-label  { font-size: 13px; font-weight: 600; color: #4a6cf7; }
+
+        /* 計時器 */
+        #timer-display { font-size: 20px; font-weight: 700; color: #333; background: #f0f4ff; border: 1.5px solid #d0daff; border-radius: 10px; padding: 5px 14px; min-width: 70px; text-align: center; font-variant-numeric: tabular-nums; }
+        #timer-display.warning { color: #e67e00; background: #fff3e0; border-color: #ffd0a0; }
+
         .progress-wrap { background: #e5e5e5; height: 12px; border-radius: 10px; margin-bottom: 6px; overflow: hidden; }
         .progress-fill { height: 100%; background: #58cc02; border-radius: 10px; transition: width 0.3s; }
         .q-counter   { font-size: 13px; color: #aaa; text-align: right; margin-bottom: 14px; }
@@ -69,12 +73,6 @@
         #question-type-text { font-size: 16px; color: #999; margin-bottom: 5px; }
         #sentence-hint { font-size: 21px; font-weight: bold; margin-bottom: 15px; min-height: 56px; line-height: 1.5; color: #333; }
         .highlight { color: #1cb0f6; }
-
-        .tense-tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 12px; margin-bottom: 8px; }
-        .t-present-simple { background: #e0f7fa; color: #00796b; }
-        .t-present-cont   { background: #e8f5e9; color: #2e7d32; }
-        .t-past-simple    { background: #fff8e1; color: #f57f17; }
-        .t-past-cont      { background: #fce4ec; color: #c62828; }
 
         .target-image { width: 260px; height: 195px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; border: 1px solid #ddd; display: block; margin-left: auto; margin-right: auto; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -96,7 +94,20 @@
         #result-zone { display: none; text-align: center; padding: 10px 0; }
         .result-emoji { font-size: 60px; margin-bottom: 10px; }
         .result-score { font-size: 46px; font-weight: 700; color: #1cb0f6; margin: 8px 0 4px; }
-        .result-msg   { font-size: 16px; color: #555; margin-bottom: 20px; }
+        .result-msg   { font-size: 16px; color: #555; margin-bottom: 16px; }
+
+        /* 時間顯示卡片 */
+        .time-cards { display: flex; gap: 10px; margin-bottom: 16px; }
+        .time-card  { flex: 1; background: #f0f4ff; border: 1px solid #d0daff; border-radius: 14px; padding: 12px 8px; text-align: center; }
+        .time-card.best { background: #fff8e1; border-color: #ffd54f; }
+        .time-card-label { font-size: 12px; color: #888; margin-bottom: 4px; }
+        .time-card-value { font-size: 22px; font-weight: 700; color: #333; }
+        .time-card.best .time-card-value { color: #f57f17; }
+
+        /* 刷新紀錄橫幅 */
+        .new-record-banner { background: linear-gradient(135deg, #ffecd2, #fcb69f); border-radius: 14px; padding: 14px; margin-bottom: 16px; font-size: 18px; font-weight: 700; color: #8b3a00; display: none; }
+        .new-record-banner.show { display: block; }
+
         .result-btns  { display: flex; gap: 12px; }
 
         /* ── 錯誤訊息 ── */
@@ -117,7 +128,7 @@
         <div class="login-logo">🏥</div>
         <div class="login-title">互動語言練習</div>
         <div class="login-sub">請輸入你的名字才能開始！</div>
-        <input class="login-input" type="text" id="student-name" placeholder="輸入你的名字..." maxlength="20">
+        <input class="login-input" type="text" id="student-name"  placeholder="輸入你的名字..." maxlength="20">
         <input class="login-input" type="text" id="student-class" placeholder="輸入班級（例如：四年甲班）" maxlength="20">
         <div class="error-box" id="login-error"></div>
         <button class="btn-login" id="login-btn" onclick="handleLogin()">開始學習 →</button>
@@ -148,8 +159,12 @@
     <!-- ④ 測驗 -->
     <div id="quiz-container">
         <div class="quiz-topbar">
-            <button class="back-link" id="quiz-back-btn">← 返回</button>
-            <span class="mode-label" id="quiz-mode-label"></span>
+            <div class="quiz-topbar-left">
+                <button class="back-link" id="quiz-back-btn">← 返回</button>
+                <span class="mode-label" id="quiz-mode-label"></span>
+            </div>
+            <!-- 計時器 -->
+            <div id="timer-display">0:00</div>
         </div>
         <div class="progress-wrap">
             <div class="progress-fill" id="progress-fill" style="width:0%"></div>
@@ -172,9 +187,27 @@
 
         <div id="result-zone">
             <div class="result-emoji" id="result-emoji"></div>
-            <div style="font-size:20px;font-weight:700;color:#333;">學習完成！</div>
+            <div style="font-size:20px;font-weight:700;color:#333;margin-bottom:6px;">學習完成！</div>
             <div class="result-score" id="result-score"></div>
             <div class="result-msg"   id="result-msg"></div>
+
+            <!-- 刷新最快紀錄橫幅 -->
+            <div class="new-record-banner" id="new-record-banner">
+                🏅 新紀錄！刷新最快時間！
+            </div>
+
+            <!-- 本輪時間 & 最快紀錄 -->
+            <div class="time-cards">
+                <div class="time-card">
+                    <div class="time-card-label">本輪時間</div>
+                    <div class="time-card-value" id="result-time"></div>
+                </div>
+                <div class="time-card best">
+                    <div class="time-card-label">🏆 最快紀錄</div>
+                    <div class="time-card-value" id="result-best-time"></div>
+                </div>
+            </div>
+
             <div class="result-btns">
                 <button class="btn-start"  id="retry-btn">再試一次</button>
                 <button class="btn-return" onclick="goHome()">回首頁</button>
@@ -197,9 +230,8 @@ const headers = {
     'Authorization': 'Bearer ' + SUPABASE_KEY
 };
 
-// ── Supabase API 工具函式 ──────────────────────────
+// ── Supabase API ─────────────────────────────────
 
-// 從 questions 表抓題目
 async function fetchQuestions(mode) {
     const res = await fetch(
         `${SUPABASE_URL}/rest/v1/questions?mode=eq.${mode}&select=*`,
@@ -209,17 +241,14 @@ async function fetchQuestions(mode) {
     return await res.json();
 }
 
-// 新增或取得學生（用名字+班級查，沒有就新增）
 async function upsertStudent(name, className) {
-    // 先查有沒有這個學生
     const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/students?name=eq.${encodeURIComponent(name)}&class_name=eq.${encodeURIComponent(className)}&select=id,name,class_name`,
+        `${SUPABASE_URL}/rest/v1/students?name=eq.${encodeURIComponent(name)}&class_name=eq.${encodeURIComponent(className)}&select=*`,
         { headers }
     );
     const data = await res.json();
     if (data.length > 0) return data[0];
 
-    // 沒有就新增
     const insertRes = await fetch(
         `${SUPABASE_URL}/rest/v1/students`,
         {
@@ -233,29 +262,92 @@ async function upsertStudent(name, className) {
     return inserted[0];
 }
 
-// 儲存答題記錄
 async function saveRecord(studentId, questionId, mode, isCorrect) {
+    await fetch(`${SUPABASE_URL}/rest/v1/records`, {
+        method:  'POST',
+        headers: { ...headers, 'Prefer': 'return=minimal' },
+        body:    JSON.stringify({ student_id: studentId, question_id: questionId, mode, is_correct: isCorrect })
+    }).catch(() => {});
+}
+
+// 完成一輪後，更新 students 表的 last & best 秒數
+async function updateStudentTime(studentId, mode, seconds) {
+    // 先拿目前的 best
+    const res  = await fetch(
+        `${SUPABASE_URL}/rest/v1/students?id=eq.${studentId}&select=best_vocab_seconds,best_grammar_seconds,last_vocab_seconds,last_grammar_seconds`,
+        { headers }
+    );
+    const data = await res.json();
+    if (!data.length) return { isNewRecord: false, bestSeconds: null };
+
+    const row        = data[0];
+    const bestKey    = mode === 'vocab' ? 'best_vocab_seconds'   : 'best_grammar_seconds';
+    const lastKey    = mode === 'vocab' ? 'last_vocab_seconds'   : 'last_grammar_seconds';
+    const currentBest = row[bestKey];
+
+    const isNewRecord = (currentBest === null || seconds < currentBest);
+    const newBest     = isNewRecord ? seconds : currentBest;
+
+    // PATCH 更新
     await fetch(
-        `${SUPABASE_URL}/rest/v1/records`,
+        `${SUPABASE_URL}/rest/v1/students?id=eq.${studentId}`,
         {
-            method:  'POST',
+            method:  'PATCH',
             headers: { ...headers, 'Prefer': 'return=minimal' },
             body:    JSON.stringify({
-                student_id:  studentId,
-                question_id: questionId,
-                mode:        mode,
-                is_correct:  isCorrect
+                [lastKey]: seconds,
+                [bestKey]: newBest
             })
         }
-    ).catch(() => {}); // 記錄失敗不影響遊戲
+    ).catch(() => {});
+
+    return { isNewRecord, bestSeconds: newBest };
+}
+
+// ═══════════════════════════════════════════════════
+// 計時器
+// ═══════════════════════════════════════════════════
+let timerInterval = null;
+let timerSeconds  = 0;
+
+function startTimer() {
+    timerSeconds = 0;
+    updateTimerDisplay();
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        timerSeconds++;
+        updateTimerDisplay();
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+}
+
+function updateTimerDisplay() {
+    const m   = Math.floor(timerSeconds / 60);
+    const s   = timerSeconds % 60;
+    const str = m + ':' + String(s).padStart(2, '0');
+    const el  = document.getElementById('timer-display');
+    el.innerText = str;
+    // 超過 3 分鐘變橘色警示
+    el.className = timerSeconds >= 180 ? 'warning' : '';
+}
+
+function formatTime(seconds) {
+    if (seconds === null || seconds === undefined) return '—';
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return m + ':' + String(s).padStart(2, '0');
 }
 
 // ═══════════════════════════════════════════════════
 // 狀態
 // ═══════════════════════════════════════════════════
-let currentStudent = null;  // { id, name, class_name }
+let currentStudent = null;
 let appMode        = '';
-let allQuestions   = [];    // 從 Supabase 抓回來的題目
+let allQuestions   = [];
 let currentPool    = [];
 let totalRound     = 0;
 let correctCount   = 0;
@@ -274,10 +366,13 @@ function showScreen(id) {
     document.getElementById(id).style.display = 'block';
 }
 
-function goHome() { showScreen('home-screen'); }
+function goHome() {
+    stopTimer();
+    showScreen('home-screen');
+}
 
 // ═══════════════════════════════════════════════════
-// 學生登入
+// 登入
 // ═══════════════════════════════════════════════════
 async function handleLogin() {
     const name      = document.getElementById('student-name').value.trim();
@@ -285,16 +380,8 @@ async function handleLogin() {
     const errBox    = document.getElementById('login-error');
     errBox.style.display = 'none';
 
-    if (!name) {
-        errBox.innerText = '請輸入你的名字！';
-        errBox.style.display = 'block';
-        return;
-    }
-    if (!className) {
-        errBox.innerText = '請輸入班級！';
-        errBox.style.display = 'block';
-        return;
-    }
+    if (!name)      { errBox.innerText = '請輸入你的名字！';  errBox.style.display = 'block'; return; }
+    if (!className) { errBox.innerText = '請輸入班級！';       errBox.style.display = 'block'; return; }
 
     document.getElementById('login-btn').disabled = true;
     showScreen('loading-screen');
@@ -312,7 +399,6 @@ async function handleLogin() {
     }
 }
 
-// Enter 鍵也可以登入
 document.getElementById('student-class').addEventListener('keydown', e => {
     if (e.key === 'Enter') handleLogin();
 });
@@ -332,15 +418,15 @@ function goSub(mode) {
         document.getElementById('sub-icon').innerText  = '✏️';
         document.getElementById('sub-title').innerText = '文法練習';
         document.getElementById('sub-desc').innerText  = '四大時態選擇題，每題挑出正確的動詞形式。';
-        //document.getElementById('sub-tags').innerHTML  =
-           // '<span class="tag">現在簡單式</span><span class="tag">現在進行式</span><span class="tag">過去簡單式</span><span class="tag">過去進行式</span>';
+        document.getElementById('sub-tags').innerHTML  =
+            '<span class="tag">現在簡單式</span><span class="tag">現在進行式</span><span class="tag">過去簡單式</span><span class="tag">過去進行式</span>';
     }
-    document.getElementById('quiz-back-btn').onclick = () => goSub(mode);
+    document.getElementById('quiz-back-btn').onclick = () => { stopTimer(); goSub(mode); };
     showScreen('sub-screen');
 }
 
 // ═══════════════════════════════════════════════════
-// 開始遊戲（從 Supabase 抓題）
+// 開始遊戲
 // ═══════════════════════════════════════════════════
 async function startGame() {
     showScreen('loading-screen');
@@ -363,6 +449,9 @@ async function startGame() {
     document.getElementById('retry-btn').onclick = startGame;
 
     showScreen('quiz-container');
+
+    // 開始計時
+    startTimer();
     loadQuestion();
 }
 
@@ -370,12 +459,11 @@ async function startGame() {
 // 載入題目
 // ═══════════════════════════════════════════════════
 function loadQuestion() {
-    if (currentPool.length === 0) { showResult(); return; }
+    if (currentPool.length === 0) { finishGame(); return; }
 
     const done = totalRound - currentPool.length;
     document.getElementById('q-counter').innerText = `題目 ${done + 1} / ${totalRound}`;
 
-    // 重置 UI
     document.getElementById('feedback').innerText        = '';
     document.getElementById('feedback').style.color      = '#333';
     document.getElementById('user-input').value          = '';
@@ -402,7 +490,6 @@ function loadVocabQuestion() {
     document.getElementById('main-image').src           = q.image_path;
     document.getElementById('main-image').style.display = 'block';
 
-    // options 是 Supabase 存的 JSONB，直接就是陣列
     const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options);
 
     if (questionMode === 'choice') {
@@ -442,18 +529,6 @@ function loadGrammarQuestion() {
     const q = currentPool[0];
     setTypeBadge('文法選擇', 'badge-grammar');
     document.getElementById('question-type-text').innerText = '選出正確的動詞形式';
-
-    const tenseClassMap = {
-        'present-simple': 't-present-simple',
-        'present-cont':   't-present-cont',
-        'past-simple':    't-past-simple',
-        'past-cont':      't-past-cont'
-    };
-    const tenseEl = document.createElement('span');
-    tenseEl.className = 'tense-tag ' + (tenseClassMap[q.type] || '');
-    tenseEl.innerText = q.tense_label;
-    document.getElementById('tense-tag-wrap').appendChild(tenseEl);
-
     document.getElementById('sentence-hint').innerHTML =
         q.question_text.replace('___', '<span class="highlight">___</span>');
 
@@ -462,12 +537,12 @@ function loadGrammarQuestion() {
 }
 
 // ═══════════════════════════════════════════════════
-// 共用 UI 工具
+// 共用 UI
 // ═══════════════════════════════════════════════════
 function setTypeBadge(text, cls) {
     const el = document.getElementById('type-badge');
-    el.innerText  = text;
-    el.className  = 'type-badge ' + cls;
+    el.innerText = text;
+    el.className = 'type-badge ' + cls;
 }
 
 function renderOptions(opts, answer, singleCol) {
@@ -520,7 +595,6 @@ document.getElementById('submit-btn').onclick = async function() {
     let isCorrect      = false;
     let correctDisplay = '';
 
-    // 鎖定
     document.querySelectorAll('.opt').forEach(b => b.disabled = true);
     document.getElementById('user-input').disabled = true;
     this.disabled = true;
@@ -551,7 +625,6 @@ document.getElementById('submit-btn').onclick = async function() {
         correctDisplay = target;
     }
 
-    // 儲存記錄到 Supabase（非同步，不等它完成）
     saveRecord(currentStudent.id, q.id, appMode, isCorrect);
 
     const fb = document.getElementById('feedback');
@@ -583,9 +656,28 @@ function updateProgress() {
 }
 
 // ═══════════════════════════════════════════════════
+// 完成一輪：停計時、存紀錄、顯示結果
+// ═══════════════════════════════════════════════════
+async function finishGame() {
+    stopTimer();
+    const elapsed = timerSeconds;
+
+    // 更新 Supabase students 表，取回是否刷新紀錄
+    const { isNewRecord, bestSeconds } = await updateStudentTime(
+        currentStudent.id, appMode, elapsed
+    );
+
+    // 同步更新本地 currentStudent（讓再試一次能拿到最新 best）
+    const bestKey = appMode === 'vocab' ? 'best_vocab_seconds' : 'best_grammar_seconds';
+    currentStudent[bestKey] = bestSeconds;
+
+    showResult(elapsed, bestSeconds, isNewRecord);
+}
+
+// ═══════════════════════════════════════════════════
 // 結果頁
 // ═══════════════════════════════════════════════════
-function showResult() {
+function showResult(elapsed, bestSeconds, isNewRecord) {
     const pct = Math.round(correctCount / totalRound * 100);
     let emoji = '🎉', msg = '';
     if      (pct === 100) { emoji = '🏆'; msg = '完美！全部答對，太厲害了！'; }
@@ -593,10 +685,17 @@ function showResult() {
     else if (pct >= 60)   { emoji = '👍'; msg = '不錯喔！再多練習幾次！'; }
     else                  { emoji = '💪'; msg = '繼續努力，每次都有進步！'; }
 
-    document.getElementById('result-emoji').innerText = emoji;
-    document.getElementById('result-score').innerText = correctCount + ' / ' + totalRound;
-    document.getElementById('result-msg').innerText   = msg;
+    document.getElementById('result-emoji').innerText   = emoji;
+    document.getElementById('result-score').innerText   = correctCount + ' / ' + totalRound;
+    document.getElementById('result-msg').innerText     = msg;
+    document.getElementById('result-time').innerText    = formatTime(elapsed);
+    document.getElementById('result-best-time').innerText = formatTime(bestSeconds);
     document.getElementById('progress-fill').style.width = '100%';
+
+    // 刷新紀錄橫幅
+    const banner = document.getElementById('new-record-banner');
+    banner.className = 'new-record-banner' + (isNewRecord ? ' show' : '');
+
     document.getElementById('game-zone').style.display   = 'none';
     document.getElementById('result-zone').style.display = 'block';
 }
@@ -613,9 +712,7 @@ function speak(text) {
     } catch(e) {}
 }
 
-// ═══════════════════════════════════════════════════
-// 啟動：直接進登入頁
-// ═══════════════════════════════════════════════════
+// 啟動
 showScreen('login-screen');
 </script>
 </body>
