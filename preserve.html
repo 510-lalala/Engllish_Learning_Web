@@ -7,33 +7,17 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; background: #f7f7f7; min-height: 100vh; }
+
+        /* ── 共用容器 ── */
         #app { width: 100%; max-width: 480px; }
 
-        /* ── 載入畫面 ── */
-        #loading-screen { background: white; padding: 60px 24px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; display: none; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #e5e5e5; border-top-color: #1cb0f6; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ── 學生登入 ── */
-        #login-screen { background: white; padding: 36px 24px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; display: none; }
-        .login-logo  { font-size: 52px; margin-bottom: 10px; }
-        .login-title { font-size: 24px; font-weight: 700; color: #333; margin-bottom: 6px; }
-        .login-sub   { font-size: 14px; color: #999; margin-bottom: 28px; }
-        .login-input { width: 100%; padding: 14px; font-size: 17px; border: 2px solid #e5e5e5; border-radius: 12px; text-align: center; margin-bottom: 10px; }
-        .login-input:focus { outline: none; border-color: #1cb0f6; }
-        .login-select { width: 100%; padding: 14px; font-size: 17px; border: 2px solid #e5e5e5; border-radius: 12px; text-align: center; margin-bottom: 20px; background: white; }
-        .login-select:focus { outline: none; border-color: #1cb0f6; }
-        .btn-login { width: 100%; padding: 16px; background: #1cb0f6; color: white; border: none; border-radius: 14px; font-size: 18px; font-weight: 700; cursor: pointer; }
-        .btn-login:hover { opacity: 0.88; }
-        .btn-login:disabled { background: #e5e5e5; color: #aaa; cursor: not-allowed; }
-
         /* ── 首頁 ── */
-        #home-screen { background: white; padding: 36px 24px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; display: none; }
-        .home-logo   { font-size: 52px; margin-bottom: 10px; }
-        .home-title  { font-size: 26px; font-weight: 700; color: #333; margin-bottom: 6px; }
-        .home-sub    { font-size: 15px; color: #999; margin-bottom: 8px; }
-        .home-student{ font-size: 15px; color: #1cb0f6; font-weight: 600; margin-bottom: 28px; }
-        .mode-btn    { display: block; width: 100%; padding: 20px; margin-bottom: 14px; border: none; border-radius: 16px; font-size: 20px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
+        #home-screen { background: white; padding: 36px 24px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; }
+        .home-logo  { font-size: 52px; margin-bottom: 10px; }
+        .home-title { font-size: 26px; font-weight: 700; color: #333; margin-bottom: 6px; }
+        .home-sub   { font-size: 15px; color: #999; margin-bottom: 32px; }
+        .mode-btn   { display: block; width: 100%; padding: 20px; margin-bottom: 14px; border: none; border-radius: 16px;
+                      font-size: 20px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
         .mode-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
         .btn-vocab   { background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; }
         .btn-grammar { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
@@ -44,10 +28,10 @@
         .sub-title { font-size: 22px; font-weight: 700; color: #333; margin-bottom: 8px; }
         .sub-desc  { font-size: 14px; color: #888; line-height: 1.6; margin-bottom: 14px; }
         .tag-row   { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
-        .tag       { background: #f0f4ff; color: #4a6cf7; font-size: 12px; padding: 4px 12px; border-radius: 20px; border: 1px solid #d0daff; }
+        .tag { background: #f0f4ff; color: #4a6cf7; font-size: 12px; padding: 4px 12px; border-radius: 20px; border: 1px solid #d0daff; }
         .sub-btns  { display: flex; gap: 12px; }
         .btn-start  { flex: 1; padding: 16px; background: #1cb0f6; color: white; border: none; border-radius: 14px; font-size: 18px; font-weight: 700; cursor: pointer; }
-        .btn-start:hover  { opacity: 0.88; }
+        .btn-start:hover { opacity: 0.88; }
         .btn-return { padding: 16px 20px; background: white; color: #888; border: 2px solid #e5e5e5; border-radius: 14px; font-size: 16px; cursor: pointer; }
         .btn-return:hover { background: #f5f5f5; }
 
@@ -60,7 +44,8 @@
         .progress-fill { height: 100%; background: #58cc02; border-radius: 10px; transition: width 0.3s; }
         .q-counter   { font-size: 13px; color: #aaa; text-align: right; margin-bottom: 14px; }
 
-        .type-badge  { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 12px; border-radius: 20px; margin-bottom: 10px; }
+        .type-badge  { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 12px;
+                       border-radius: 20px; margin-bottom: 10px; }
         .badge-choice   { background: #e8f5ff; color: #1cb0f6; }
         .badge-spelling { background: #fff3e0; color: #e67e00; }
         .badge-sentence { background: #f0fff4; color: #27ae60; }
@@ -69,12 +54,11 @@
         #question-type-text { font-size: 16px; color: #999; margin-bottom: 5px; }
         #sentence-hint { font-size: 21px; font-weight: bold; margin-bottom: 15px; min-height: 56px; line-height: 1.5; color: #333; }
         .highlight { color: #1cb0f6; }
-
         .tense-tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 12px; margin-bottom: 8px; }
-        .t-present-simple { background: #e0f7fa; color: #00796b; }
-        .t-present-cont   { background: #e8f5e9; color: #2e7d32; }
-        .t-past-simple    { background: #fff8e1; color: #f57f17; }
-        .t-past-cont      { background: #fce4ec; color: #c62828; }
+        .t-present-simple   { background: #e0f7fa; color: #00796b; }
+        .t-present-cont     { background: #e8f5e9; color: #2e7d32; }
+        .t-past-simple      { background: #fff8e1; color: #f57f17; }
+        .t-past-cont        { background: #fce4ec; color: #c62828; }
 
         .target-image { width: 260px; height: 195px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; border: 1px solid #ddd; display: block; margin-left: auto; margin-right: auto; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -85,10 +69,11 @@
         .wrong   { background: #ffdfe0 !important; border-color: #ff4b4b !important; color: #cc0000; }
 
         #input-zone { display: none; margin-top: 10px; }
-        #user-input { width: 85%; padding: 12px; font-size: 20px; border-radius: 10px; border: 2px solid #ddd; text-align: center; }
+        #user-input { width: 100%; padding: 15px; font-size: 18px; border-radius: 10px; border: 2px solid #ddd; text-align: center; }
         #user-input:focus { outline: none; border-color: #1cb0f6; }
 
-        #submit-btn { padding: 15px; font-size: 18px; font-weight: bold; border-radius: 12px; cursor: pointer; width: 100%; margin-top: 16px; background-color: #1cb0f6; color: white; border: none; }
+        #submit-btn { padding: 15px; font-size: 18px; font-weight: bold; border-radius: 12px; cursor: pointer;
+                      width: 100%; margin-top: 16px; background-color: #1cb0f6; color: white; border: none; }
         #submit-btn:disabled { background-color: #e5e5e5 !important; color: #afafaf !important; cursor: not-allowed; }
         #feedback { font-weight: bold; margin-top: 10px; min-height: 24px; font-size: 16px; text-align: center; }
 
@@ -98,42 +83,21 @@
         .result-score { font-size: 46px; font-weight: 700; color: #1cb0f6; margin: 8px 0 4px; }
         .result-msg   { font-size: 16px; color: #555; margin-bottom: 20px; }
         .result-btns  { display: flex; gap: 12px; }
-
-        /* ── 錯誤訊息 ── */
-        .error-box { background: #ffdfe0; border: 1px solid #ff4b4b; color: #cc0000; padding: 12px 16px; border-radius: 10px; font-size: 14px; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 <div id="app">
 
-    <!-- 載入中 -->
-    <div id="loading-screen">
-        <div class="spinner"></div>
-        <div style="color:#999;font-size:15px;">載入中...</div>
-    </div>
-
-    <!-- ① 學生登入 -->
-    <div id="login-screen">
-        <div class="login-logo">🏥</div>
-        <div class="login-title">互動語言練習</div>
-        <div class="login-sub">請輸入你的名字才能開始！</div>
-        <input class="login-input" type="text" id="student-name" placeholder="輸入你的名字..." maxlength="20">
-        <input class="login-input" type="text" id="student-class" placeholder="輸入班級（例如：四年甲班）" maxlength="20">
-        <div class="error-box" id="login-error"></div>
-        <button class="btn-login" id="login-btn" onclick="handleLogin()">開始學習 →</button>
-    </div>
-
-    <!-- ② 首頁 -->
+    <!-- ① 首頁 -->
     <div id="home-screen">
         <div class="home-logo">🏥</div>
         <div class="home-title">互動語言練習</div>
         <div class="home-sub">選擇練習模式，開始學習！</div>
-        <div class="home-student" id="home-student-name"></div>
         <button class="mode-btn btn-vocab"   onclick="goSub('vocab')">📖 單字練習</button>
         <button class="mode-btn btn-grammar" onclick="goSub('grammar')">✏️ 文法練習</button>
     </div>
 
-    <!-- ③ 子選單 -->
+    <!-- ② 子選單 -->
     <div id="sub-screen">
         <div class="sub-icon"  id="sub-icon"></div>
         <div class="sub-title" id="sub-title"></div>
@@ -145,7 +109,7 @@
         </div>
     </div>
 
-    <!-- ④ 測驗 -->
+    <!-- ③ 測驗 -->
     <div id="quiz-container">
         <div class="quiz-topbar">
             <button class="back-link" id="quiz-back-btn">← 返回</button>
@@ -182,85 +146,77 @@
         </div>
     </div>
 
-</div>
+</div><!-- /app -->
 
 <script>
 // ═══════════════════════════════════════════════════
-// Supabase 設定
+// 單字題庫（醫療健康）
 // ═══════════════════════════════════════════════════
-const SUPABASE_URL = 'https://ehiujfsrneeapfwbxbey.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVoaXVqZnNybmVlYXBmd2J4YmV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTUyMTEsImV4cCI6MjA5MjE3MTIxMX0.vf9_TB5ah4XSW1DhLxrm72NwnB5enrPNVQdLTqop4Ow';
+const vocabBank = [
+    { image:"./image/ambulance.jpg",   answer:"Call an ambulance", noun:"ambulance",   sentenceNoun:"ambulance", symptom:"a broken arm", group:"action",  options:["Call an ambulance","Go to the doctor","Take medicine","Drink liquids"] },
+    { image:"./image/bandage.jpg",     answer:"Put on a bandage",  noun:"bandage",     sentenceNoun:"bandage",   symptom:"a bruise",     group:"action",  options:["Put on a bandage","Put ice on","Bruise","Get some rest"] },
+    { image:"./image/broken_arm.jpg",  answer:"Broken arm",        noun:"broken arm",                            symptom:"broken arm",   group:"symptom", options:["Broken arm","Headache","Fever","Cough"] },
+    { image:"./image/bruise.jpg",      answer:"Bruise",            noun:"bruise",                                symptom:"bruise",       group:"symptom", options:["Bruise","Cold","Put on a bandage","Take care of"] },
+    { image:"./image/care.jpg",        answer:"Take care of",      noun:"care",        sentenceNoun:"care",      symptom:"a cold",       group:"action",  options:["Take care of","Go to the doctor","Get some rest","Drink liquids"] },
+    { image:"./image/cold.jpg",        answer:"Cold",              noun:"cold",                                  symptom:"cold",         group:"symptom", options:["Cold","Runny nose","Cough","Fever"] },
+    { image:"./image/cough.jpg",       answer:"Cough",             noun:"cough",                                 symptom:"cough",        group:"symptom", options:["Cough","Headache","Stomachache","Cold"] },
+    { image:"./image/doctor.jpg",      answer:"Go to the doctor",  noun:"doctor",      sentenceNoun:"doctor",    symptom:"a fever",      group:"action",  options:["Go to the doctor","Take care of","Take medicine","Call an ambulance"] },
+    { image:"./image/fever.jpg",       answer:"Fever",             noun:"fever",                                 symptom:"fever",        group:"symptom", options:["Fever","Cold","Headache","Cough"] },
+    { image:"./image/headache.jpg",    answer:"Headache",          noun:"headache",                              symptom:"headache",     group:"symptom", options:["Headache","Stomachache","Fever","Broken arm"] },
+    { image:"./image/ice.jpg",         answer:"Put ice on",        noun:"ice",         sentenceNoun:"ice",       symptom:"a fever",      group:"action",  options:["Put ice on","Put on a bandage","Take medicine","Drink liquids"] },
+    { image:"./image/medicine.jpg",    answer:"Take medicine",     noun:"medicine",    sentenceNoun:"medicine",  symptom:"a headache",   group:"action",  options:["Take medicine","Drink liquids","Go to the doctor","Put ice on"] },
+    { image:"./image/rest.jpg",        answer:"Get some rest",     noun:"rest",        sentenceNoun:"rest",      symptom:"a cold",       group:"action",  options:["Get some rest","Take care of","Cold","Fever"] },
+    { image:"./image/runny_nose.jpg",  answer:"Runny nose",        noun:"runny nose",                            symptom:"runny nose",   group:"symptom", options:["Runny nose","Cough","Cold","Headache"] },
+    { image:"./image/stomachache.jpg", answer:"Stomachache",       noun:"stomachache",                           symptom:"stomachache",  group:"symptom", options:["Stomachache","Headache","Fever","Bruise"] },
+    { image:"./image/water.jpg",       answer:"Drink liquids",     noun:"liquids",     sentenceNoun:"liquids",   symptom:"a fever",      group:"action",  options:["Drink liquids","Take medicine","Put ice on","Get some rest"] }
+];
 
-const headers = {
-    'Content-Type':  'application/json',
-    'apikey':        SUPABASE_KEY,
-    'Authorization': 'Bearer ' + SUPABASE_KEY
-};
+// ═══════════════════════════════════════════════════
+// 文法題庫（四大時態）
+// ═══════════════════════════════════════════════════
+const grammarBank = [
+    // 現在簡單式
+    { tense:"present-simple",  tenseLabel:"現在簡單式", q:"She ___ to school every day.",                  answer:"goes",          options:["go","goes","going","went"] },
+    { tense:"present-simple",  tenseLabel:"現在簡單式", q:"The doctor ___ patients every morning.",         answer:"sees",          options:["see","sees","seeing","saw"] },
+    { tense:"present-simple",  tenseLabel:"現在簡單式", q:"I always ___ medicine when I have a headache.",  answer:"take",          options:["take","takes","taking","took"] },
+    { tense:"present-simple",  tenseLabel:"現在簡單式", q:"He ___ a runny nose every winter.",              answer:"gets",          options:["get","gets","getting","got"] },
+    { tense:"present-simple",  tenseLabel:"現在簡單式", q:"They ___ to the doctor together.",               answer:"go",            options:["go","goes","going","went"] },
+    { tense:"present-simple",  tenseLabel:"現在簡單式", q:"My mother always ___ care of me when I'm sick.", answer:"takes",         options:["take","takes","taking","took"] },
 
-// ── Supabase API 工具函式 ──────────────────────────
+    // 現在進行式
+    { tense:"present-cont",    tenseLabel:"現在進行式", q:"She ___ medicine right now.",                    answer:"is taking",     options:["takes","is taking","took","was taking"] },
+    { tense:"present-cont",    tenseLabel:"現在進行式", q:"Look! He ___ on a bandage.",                     answer:"is putting",    options:["puts","is putting","put","was putting"] },
+    { tense:"present-cont",    tenseLabel:"現在進行式", q:"The nurse ___ the patient at the moment.",       answer:"is helping",    options:["helps","is helping","helped","was helping"] },
+    { tense:"present-cont",    tenseLabel:"現在進行式", q:"They ___ for an ambulance now.",                 answer:"are calling",   options:["call","are calling","called","were calling"] },
+    { tense:"present-cont",    tenseLabel:"現在進行式", q:"I ___ some rest because I feel sick.",           answer:"am getting",    options:["get","am getting","got","was getting"] },
+    { tense:"present-cont",    tenseLabel:"現在進行式", q:"She ___ a lot because of her cold.",             answer:"is coughing",   options:["coughs","is coughing","coughed","was coughing"] },
 
-// 從 questions 表抓題目
-async function fetchQuestions(mode) {
-    const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/questions?mode=eq.${mode}&select=*`,
-        { headers }
-    );
-    if (!res.ok) throw new Error('題目載入失敗');
-    return await res.json();
-}
+    // 過去簡單式
+    { tense:"past-simple",     tenseLabel:"過去簡單式", q:"She ___ a fever last night.",                    answer:"had",           options:["have","has","had","was having"] },
+    { tense:"past-simple",     tenseLabel:"過去簡單式", q:"He ___ to the doctor yesterday.",                answer:"went",          options:["go","goes","went","was going"] },
+    { tense:"past-simple",     tenseLabel:"過去簡單式", q:"I ___ medicine this morning.",                   answer:"took",          options:["take","takes","took","was taking"] },
+    { tense:"past-simple",     tenseLabel:"過去簡單式", q:"The ambulance ___ quickly to the hospital.",     answer:"arrived",       options:["arrive","arrives","arrived","was arriving"] },
+    { tense:"past-simple",     tenseLabel:"過去簡單式", q:"She ___ ice on her bruise after she fell.",      answer:"put",           options:["put","puts","was putting","is putting"] },
+    { tense:"past-simple",     tenseLabel:"過去簡單式", q:"They ___ care of their sick grandmother.",       answer:"took",          options:["take","takes","took","were taking"] },
 
-// 新增或取得學生（用名字+班級查，沒有就新增）
-async function upsertStudent(name, className) {
-    // 先查有沒有這個學生
-    const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/students?name=eq.${encodeURIComponent(name)}&class_name=eq.${encodeURIComponent(className)}&select=id,name,class_name`,
-        { headers }
-    );
-    const data = await res.json();
-    if (data.length > 0) return data[0];
-
-    // 沒有就新增
-    const insertRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/students`,
-        {
-            method:  'POST',
-            headers: { ...headers, 'Prefer': 'return=representation' },
-            body:    JSON.stringify({ name, class_name: className })
-        }
-    );
-    if (!insertRes.ok) throw new Error('學生資料建立失敗');
-    const inserted = await insertRes.json();
-    return inserted[0];
-}
-
-// 儲存答題記錄
-async function saveRecord(studentId, questionId, mode, isCorrect) {
-    await fetch(
-        `${SUPABASE_URL}/rest/v1/records`,
-        {
-            method:  'POST',
-            headers: { ...headers, 'Prefer': 'return=minimal' },
-            body:    JSON.stringify({
-                student_id:  studentId,
-                question_id: questionId,
-                mode:        mode,
-                is_correct:  isCorrect
-            })
-        }
-    ).catch(() => {}); // 記錄失敗不影響遊戲
-}
+    // 過去進行式
+    { tense:"past-cont",       tenseLabel:"過去進行式", q:"She ___ medicine when I called her.",            answer:"was taking",    options:["took","takes","was taking","is taking"] },
+    { tense:"past-cont",       tenseLabel:"過去進行式", q:"He ___ a lot when the doctor arrived.",          answer:"was coughing",  options:["coughed","coughs","was coughing","is coughing"] },
+    { tense:"past-cont",       tenseLabel:"過去進行式", q:"They ___ for an ambulance when it started raining.", answer:"were calling", options:["called","call","were calling","are calling"] },
+    { tense:"past-cont",       tenseLabel:"過去進行式", q:"The nurse ___ the patient when I walked in.",    answer:"was helping",   options:["helped","helps","was helping","is helping"] },
+    { tense:"past-cont",       tenseLabel:"過去進行式", q:"I ___ some rest when my phone rang.",            answer:"was getting",   options:["got","get","was getting","am getting"] },
+    { tense:"past-cont",       tenseLabel:"過去進行式", q:"She ___ her broken arm when she screamed.",      answer:"was holding",   options:["held","holds","was holding","is holding"] },
+];
 
 // ═══════════════════════════════════════════════════
 // 狀態
 // ═══════════════════════════════════════════════════
-let currentStudent = null;  // { id, name, class_name }
-let appMode        = '';
-let allQuestions   = [];    // 從 Supabase 抓回來的題目
-let currentPool    = [];
-let totalRound     = 0;
-let correctCount   = 0;
+let appMode      = '';        // 'vocab' | 'grammar'
+let currentPool  = [];
+let totalRound   = 0;
+let correctCount = 0;
 let selectedOption = null;
-let questionMode   = 'choice';
+let questionMode = "choice"; // vocab 內部題型
 
 const correctSound = new Audio('./sound/correct.mp3');
 const wrongSound   = new Audio('./sound/wrong.mp3');
@@ -269,57 +225,13 @@ const wrongSound   = new Audio('./sound/wrong.mp3');
 // 畫面切換
 // ═══════════════════════════════════════════════════
 function showScreen(id) {
-    ['loading-screen','login-screen','home-screen','sub-screen','quiz-container']
-        .forEach(s => document.getElementById(s).style.display = 'none');
+    ['home-screen','sub-screen','quiz-container'].forEach(s =>
+        document.getElementById(s).style.display = 'none');
     document.getElementById(id).style.display = 'block';
 }
 
 function goHome() { showScreen('home-screen'); }
 
-// ═══════════════════════════════════════════════════
-// 學生登入
-// ═══════════════════════════════════════════════════
-async function handleLogin() {
-    const name      = document.getElementById('student-name').value.trim();
-    const className = document.getElementById('student-class').value.trim();
-    const errBox    = document.getElementById('login-error');
-    errBox.style.display = 'none';
-
-    if (!name) {
-        errBox.innerText = '請輸入你的名字！';
-        errBox.style.display = 'block';
-        return;
-    }
-    if (!className) {
-        errBox.innerText = '請輸入班級！';
-        errBox.style.display = 'block';
-        return;
-    }
-
-    document.getElementById('login-btn').disabled = true;
-    showScreen('loading-screen');
-
-    try {
-        currentStudent = await upsertStudent(name, className);
-        document.getElementById('home-student-name').innerText =
-            `👤 ${currentStudent.name}（${currentStudent.class_name}）`;
-        showScreen('home-screen');
-    } catch(e) {
-        document.getElementById('login-btn').disabled = false;
-        errBox.innerText = '連線失敗，請確認網路後再試。';
-        errBox.style.display = 'block';
-        showScreen('login-screen');
-    }
-}
-
-// Enter 鍵也可以登入
-document.getElementById('student-class').addEventListener('keydown', e => {
-    if (e.key === 'Enter') handleLogin();
-});
-
-// ═══════════════════════════════════════════════════
-// 選擇模式
-// ═══════════════════════════════════════════════════
 function goSub(mode) {
     appMode = mode;
     if (mode === 'vocab') {
@@ -340,20 +252,12 @@ function goSub(mode) {
 }
 
 // ═══════════════════════════════════════════════════
-// 開始遊戲（從 Supabase 抓題）
+// 遊戲啟動
 // ═══════════════════════════════════════════════════
-async function startGame() {
-    showScreen('loading-screen');
-    try {
-        allQuestions = await fetchQuestions(appMode);
-    } catch(e) {
-        alert('題目載入失敗，請確認網路連線。');
-        showScreen('sub-screen');
-        return;
-    }
-
+function startGame() {
+    const bank = appMode === 'vocab' ? vocabBank : grammarBank;
     totalRound   = appMode === 'vocab' ? 16 : 10;
-    currentPool  = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, totalRound);
+    currentPool  = [...bank].sort(() => 0.5 - Math.random()).slice(0, totalRound);
     correctCount = 0;
 
     document.getElementById('quiz-mode-label').innerText = appMode === 'vocab' ? '📖 單字練習' : '✏️ 文法練習';
@@ -372,21 +276,21 @@ async function startGame() {
 function loadQuestion() {
     if (currentPool.length === 0) { showResult(); return; }
 
-    const done = totalRound - currentPool.length;
+    const done  = totalRound - currentPool.length;
     document.getElementById('q-counter').innerText = `題目 ${done + 1} / ${totalRound}`;
 
-    // 重置 UI
-    document.getElementById('feedback').innerText        = '';
-    document.getElementById('feedback').style.color      = '#333';
-    document.getElementById('user-input').value          = '';
-    document.getElementById('user-input').oninput        = null;
-    document.getElementById('user-input').disabled       = false;
-    document.getElementById('submit-btn').disabled       = true;
-    document.getElementById('main-image').style.display  = 'none';
-    document.getElementById('sentence-hint').innerHTML   = '';
-    document.getElementById('tense-tag-wrap').innerHTML  = '';
-    document.getElementById('options').innerHTML         = '';
-    document.getElementById('input-zone').style.display  = 'none';
+    // 重置
+    document.getElementById('feedback').innerText   = '';
+    document.getElementById('feedback').style.color = '#333';
+    document.getElementById('user-input').value     = '';
+    document.getElementById('user-input').oninput   = null;
+    document.getElementById('user-input').disabled  = false;
+    document.getElementById('submit-btn').disabled  = true;
+    document.getElementById('main-image').style.display = 'none';
+    document.getElementById('sentence-hint').innerHTML  = '';
+    document.getElementById('tense-tag-wrap').innerHTML = '';
+    document.getElementById('options').innerHTML        = '';
+    document.getElementById('input-zone').style.display = 'none';
     selectedOption = null;
 
     if (appMode === 'vocab') loadVocabQuestion();
@@ -395,40 +299,37 @@ function loadQuestion() {
 
 // ── 單字題 ──────────────────────────────────────────
 function loadVocabQuestion() {
-    const q      = currentPool[0];
-    const modes  = ['choice', 'spelling', 'sentence'];
-    questionMode = modes[Math.floor(Math.random() * modes.length)];
+    const q       = currentPool[0];
+    const modes   = ["choice", "spelling", "sentence"];
+    questionMode  = modes[Math.floor(Math.random() * modes.length)];
 
-    document.getElementById('main-image').src           = q.image_path;
+    document.getElementById('main-image').src          = q.image;
     document.getElementById('main-image').style.display = 'block';
 
-    // options 是 Supabase 存的 JSONB，直接就是陣列
-    const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options);
-
-    if (questionMode === 'choice') {
-        setTypeBadge('選擇題', 'badge-choice');
+    if (questionMode === "choice") {
+        setTypeBadge("選擇題", "badge-choice");
         document.getElementById('question-type-text').innerText = '看圖，選出正確的答案';
-        renderOptions(opts, q.answer);
+        renderOptions(q.options, q.answer);
     }
-    else if (questionMode === 'spelling') {
-        setTypeBadge('拼字題', 'badge-spelling');
+    else if (questionMode === "spelling") {
+        setTypeBadge("拼字題", "badge-spelling");
         document.getElementById('question-type-text').innerText = '請拼出關鍵字（名詞）';
         document.getElementById('sentence-hint').innerHTML = q.answer.replace(
-            new RegExp(q.noun, 'gi'),
+            new RegExp(q.noun, "gi"),
             `<span class="highlight">${makeCloze(q.noun)}</span>`
         );
         showInput();
     }
     else {
-        setTypeBadge('句子填空', 'badge-sentence');
+        setTypeBadge("句子填空", "badge-sentence");
         document.getElementById('question-type-text').innerText = '完成填空';
-        if (q.grp === 'symptom') {
+        if (q.group === "symptom") {
             document.getElementById('sentence-hint').innerHTML =
                 `She has a <span class="highlight">${makeCloze(q.noun)}</span>. She should go to the doctor.`;
         } else {
             const actionWithBlank = q.answer.replace(
-                new RegExp('\\b' + q.sentence_noun + '\\b', 'gi'),
-                `<span class="highlight">${makeCloze(q.sentence_noun)}</span>`
+                new RegExp("\\b" + q.sentenceNoun + "\\b", "gi"),
+                `<span class="highlight">${makeCloze(q.sentenceNoun)}</span>`
             );
             document.getElementById('sentence-hint').innerHTML =
                 `She has ${q.symptom}. She should ${actionWithBlank}.`;
@@ -440,25 +341,26 @@ function loadVocabQuestion() {
 // ── 文法題 ──────────────────────────────────────────
 function loadGrammarQuestion() {
     const q = currentPool[0];
-    setTypeBadge('文法選擇', 'badge-grammar');
+    setTypeBadge("文法選擇", "badge-grammar");
     document.getElementById('question-type-text').innerText = '選出正確的動詞形式';
 
+    // 時態標籤
     const tenseClassMap = {
-        'present-simple': 't-present-simple',
-        'present-cont':   't-present-cont',
-        'past-simple':    't-past-simple',
-        'past-cont':      't-past-cont'
+        'present-simple':'t-present-simple',
+        'present-cont':  't-present-cont',
+        'past-simple':   't-past-simple',
+        'past-cont':     't-past-cont'
     };
     const tenseEl = document.createElement('span');
-    tenseEl.className = 'tense-tag ' + (tenseClassMap[q.type] || '');
-    tenseEl.innerText = q.tense_label;
+    tenseEl.className   = 'tense-tag ' + (tenseClassMap[q.tense] || '');
+    tenseEl.innerText   = q.tenseLabel;
     document.getElementById('tense-tag-wrap').appendChild(tenseEl);
 
+    // 把 ___ 換成醒目樣式顯示問句
     document.getElementById('sentence-hint').innerHTML =
-        q.question_text.replace('___', '<span class="highlight">___</span>');
+        q.q.replace('___', '<span class="highlight">___</span>');
 
-    const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options);
-    renderOptions(opts, q.answer, true);
+    renderOptions(q.options, q.answer, true);
 }
 
 // ═══════════════════════════════════════════════════
@@ -466,19 +368,20 @@ function loadGrammarQuestion() {
 // ═══════════════════════════════════════════════════
 function setTypeBadge(text, cls) {
     const el = document.getElementById('type-badge');
-    el.innerText  = text;
-    el.className  = 'type-badge ' + cls;
+    el.innerText   = text;
+    el.className   = 'type-badge ' + cls;
 }
 
 function renderOptions(opts, answer, singleCol) {
     const div = document.getElementById('options');
     div.className = 'options-grid' + (singleCol ? ' single-col' : '');
     div.innerHTML = '';
+    // 文法選項較長時自動切單欄
     const maxLen = Math.max(...opts.map(o => o.length));
     if (maxLen > 12) div.classList.add('single-col');
 
     [...opts].sort(() => 0.5 - Math.random()).forEach(opt => {
-        const btn     = document.createElement('button');
+        const btn = document.createElement('button');
         btn.className = 'opt';
         btn.innerText = opt;
         btn.onclick   = () => {
@@ -514,10 +417,10 @@ function makeCloze(word) {
 // ═══════════════════════════════════════════════════
 // 提交答案
 // ═══════════════════════════════════════════════════
-document.getElementById('submit-btn').onclick = async function() {
+document.getElementById('submit-btn').onclick = function() {
     const q       = currentPool[0];
     const userAns = (selectedOption || '').toLowerCase().trim();
-    let isCorrect      = false;
+    let isCorrect     = false;
     let correctDisplay = '';
 
     // 鎖定
@@ -528,6 +431,7 @@ document.getElementById('submit-btn').onclick = async function() {
     if (appMode === 'grammar') {
         isCorrect      = userAns === q.answer.toLowerCase();
         correctDisplay = q.answer;
+        // 標示選項顏色
         document.querySelectorAll('.opt').forEach(b => {
             if (b.innerText.toLowerCase() === q.answer.toLowerCase()) b.classList.add('correct');
             else if (b.innerText === selectedOption)                  b.classList.add('wrong');
@@ -545,14 +449,11 @@ document.getElementById('submit-btn').onclick = async function() {
         isCorrect      = userAns === q.noun.toLowerCase();
         correctDisplay = q.noun;
     }
-    else {
-        const target   = (q.grp === 'symptom') ? q.noun : q.sentence_noun;
+    else { // sentence
+        const target   = (q.group === 'symptom') ? q.noun : q.sentenceNoun;
         isCorrect      = userAns === target.toLowerCase();
         correctDisplay = target;
     }
-
-    // 儲存記錄到 Supabase（非同步，不等它完成）
-    saveRecord(currentStudent.id, q.id, appMode, isCorrect);
 
     const fb = document.getElementById('feedback');
     if (isCorrect) {
@@ -613,10 +514,8 @@ function speak(text) {
     } catch(e) {}
 }
 
-// ═══════════════════════════════════════════════════
-// 啟動：直接進登入頁
-// ═══════════════════════════════════════════════════
-showScreen('login-screen');
+// 啟動首頁
+showScreen('home-screen');
 </script>
 </body>
 </html>
