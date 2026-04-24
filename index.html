@@ -573,7 +573,11 @@ function loadVocabQuestion() {
     const modes  = ['choice', 'spelling', 'sentence'];
     questionMode = modes[Math.floor(Math.random() * modes.length)];
 
-    document.getElementById('main-image').src           = q.image_path;
+    let finalPath = q.image_path;
+if (finalPath && finalPath.startsWith('./')) {
+    finalPath = finalPath.substring(1); // 把 "." 去掉，變成 "/U7images/..."
+}
+document.getElementById('main-image').src = finalPath;
     document.getElementById('main-image').style.display = 'block';
 
     const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options);
@@ -640,7 +644,11 @@ function loadMatchingQuestion() {
         setTypeBadge('Matching — 看圖選字', 'badge-choice');
         document.getElementById('question-type-text').innerText = q.question_text;
         if (q.image_path) {
-            document.getElementById('main-image').src           = q.image_path;
+            let finalPath = q.image_path;
+if (finalPath && finalPath.startsWith('./')) {
+    finalPath = finalPath.substring(1); // 把 "." 去掉，變成 "/U7images/..."
+}
+document.getElementById('main-image').src = finalPath;
             document.getElementById('main-image').style.display = 'block';
         }
         renderOptions(opts, q.answer);
@@ -679,7 +687,11 @@ function loadSpellingQuestion() {
 
     // 顯示圖片（如果有）
     if (q.image_path) {
-        document.getElementById('main-image').src           = q.image_path;
+        let finalPath = q.image_path;
+if (finalPath && finalPath.startsWith('./')) {
+    finalPath = finalPath.substring(1); // 把 "." 去掉，變成 "/U7images/..."
+}
+document.getElementById('main-image').src = finalPath;
         document.getElementById('main-image').style.display = 'block';
     }
     showInput();
