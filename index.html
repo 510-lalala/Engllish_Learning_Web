@@ -403,6 +403,7 @@ let questionMode   = 'choice';
 
 const correctSound = new Audio('./sound/correct.mp3');
 const wrongSound   = new Audio('./sound/wrong.mp3');
+const winSound     = new Audio('./sound/win.mp3');
 
 // ═══════════════════════════════════════════════════
 // 畫面切換
@@ -882,6 +883,7 @@ function updateProgress() {
 async function finishGame() {
     stopTimer();
     const elapsed = timerSeconds;
+    winSound.play().catch(e => console.log("音效播放失敗:", e));
 
     // 更新 Supabase students 表，取回是否刷新紀錄
     const { isNewRecord, bestSeconds } = await updateStudentTime(
