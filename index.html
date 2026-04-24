@@ -31,16 +31,17 @@
         .home-title   { font-size: 26px; font-weight: 700; color: #333; margin-bottom: 6px; }
         .home-sub     { font-size: 15px; color: #999; margin-bottom: 8px; }
         .home-student { font-size: 15px; color: #1cb0f6; font-weight: 600; margin-bottom: 20px; }
+        /* 三個並排按鈕 */
         .mode-btn-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 0; }
         .mode-btn     { display: block; width: 100%; padding: 18px 8px; border: none; border-radius: 16px; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; line-height: 1.4; }
         .mode-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
         .btn-u6vocab  { background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; }
         .btn-u7vocab  { background: linear-gradient(135deg, #f7971e, #ffd200); color: white; }
         .btn-grammar  { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
-        
+        /* 喇叭按鈕（拼字題） */
         .speak-btn { background: none; border: 2px solid #1cb0f6; border-radius: 50%; width: 44px; height: 44px; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px; transition: background 0.15s; }
         .speak-btn:hover { background: #ddf4ff; }
-
+        /* Matching 看字選圖：圖片選項網格 */
         .img-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
         .img-opt-btn { padding: 6px; border: 3px solid #e5e5e5; border-radius: 12px; background: white; cursor: pointer; transition: 0.15s; }
         .img-opt-btn img { width: 100%; height: 100px; object-fit: cover; border-radius: 8px; display: block; }
@@ -48,6 +49,7 @@
         .img-opt-btn.selected { border-color: #1cb0f6; background: #ddf4ff; }
         .img-opt-btn.correct  { border-color: #58cc02 !important; background: #d7ffb8; }
         .img-opt-btn.wrong    { border-color: #ff4b4b !important; background: #ffdfe0; }
+        /* 發音題 badge */
         .badge-phonics { background: #fff0f5; color: #c0392b; }
 
         /* ── 子選單 ── */
@@ -70,6 +72,7 @@
         .back-link   { background: none; border: 1.5px solid #ddd; border-radius: 10px; padding: 6px 12px; font-size: 13px; cursor: pointer; color: #888; }
         .mode-label  { font-size: 13px; font-weight: 600; color: #4a6cf7; }
 
+        /* 計時器 */
         #timer-display { font-size: 20px; font-weight: 700; color: #333; background: #f0f4ff; border: 1.5px solid #d0daff; border-radius: 10px; padding: 5px 14px; min-width: 70px; text-align: center; font-variant-numeric: tabular-nums; }
         #timer-display.warning { color: #e67e00; background: #fff3e0; border-color: #ffd0a0; }
 
@@ -109,6 +112,7 @@
         .result-score { font-size: 46px; font-weight: 700; color: #1cb0f6; margin: 8px 0 4px; }
         .result-msg   { font-size: 16px; color: #555; margin-bottom: 16px; }
 
+        /* 時間顯示卡片 */
         .time-cards { display: flex; gap: 10px; margin-bottom: 16px; }
         .time-card  { flex: 1; background: #f0f4ff; border: 1px solid #d0daff; border-radius: 14px; padding: 12px 8px; text-align: center; }
         .time-card.best { background: #fff8e1; border-color: #ffd54f; }
@@ -116,22 +120,26 @@
         .time-card-value { font-size: 22px; font-weight: 700; color: #333; }
         .time-card.best .time-card-value { color: #f57f17; }
 
+        /* 刷新紀錄橫幅 */
         .new-record-banner { background: linear-gradient(135deg, #ffecd2, #fcb69f); border-radius: 14px; padding: 14px; margin-bottom: 16px; font-size: 18px; font-weight: 700; color: #8b3a00; display: none; }
         .new-record-banner.show { display: block; }
 
         .result-btns  { display: flex; gap: 12px; }
 
+        /* ── 錯誤訊息 ── */
         .error-box { background: #ffdfe0; border: 1px solid #ff4b4b; color: #cc0000; padding: 12px 16px; border-radius: 10px; font-size: 14px; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 <div id="app">
 
+    <!-- 載入中 -->
     <div id="loading-screen">
         <div class="spinner"></div>
         <div style="color:#999;font-size:15px;">載入中...</div>
     </div>
 
+    <!-- ① 學生登入 -->
     <div id="login-screen">
         <div class="login-logo">🏥</div>
         <div class="login-title">互動語言練習</div>
@@ -142,6 +150,7 @@
         <button class="btn-login" id="login-btn" onclick="handleLogin()">開始學習 →</button>
     </div>
 
+    <!-- ② 首頁 -->
     <div id="home-screen">
         <div class="home-logo">🏥</div>
         <div class="home-title">互動語言練習</div>
@@ -154,15 +163,18 @@
         </div>
     </div>
 
+    <!-- ③ 子選單 -->
     <div id="sub-screen">
         <div class="sub-icon"  id="sub-icon"></div>
         <div class="sub-title" id="sub-title"></div>
         <div class="sub-desc"  id="sub-desc"></div>
         <div class="tag-row"   id="sub-tags"></div>
+        <!-- 一般模式按鈕（U6 / 文法） -->
         <div class="sub-btns" id="sub-normal-btns">
             <button class="btn-start"  onclick="startGame()">▶ Start</button>
             <button class="btn-return" onclick="goHome()">Return</button>
         </div>
+        <!-- U7 專屬三選項 -->
         <div id="sub-u7-btns" style="display:none">
             <div class="mode-btn-row" style="margin-bottom:14px;">
                 <button class="mode-btn" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb);color:white;" onclick="startU7('matching')">🎯<br>Matching</button>
@@ -173,12 +185,14 @@
         </div>
     </div>
 
+    <!-- ④ 測驗 -->
     <div id="quiz-container">
         <div class="quiz-topbar">
             <div class="quiz-topbar-left">
                 <button class="back-link" id="quiz-back-btn">← 返回</button>
                 <span class="mode-label" id="quiz-mode-label"></span>
             </div>
+            <!-- 計時器 -->
             <div id="timer-display">0:00</div>
         </div>
         <div class="progress-wrap">
@@ -206,10 +220,12 @@
             <div class="result-score" id="result-score"></div>
             <div class="result-msg"   id="result-msg"></div>
 
+            <!-- 刷新最快紀錄橫幅 -->
             <div class="new-record-banner" id="new-record-banner">
                 🏅 新紀錄！刷新最快時間！
             </div>
 
+            <!-- 本輪時間 & 最快紀錄 -->
             <div class="time-cards">
                 <div class="time-card">
                     <div class="time-card-label">本輪時間</div>
@@ -231,6 +247,9 @@
 </div>
 
 <script>
+// ═══════════════════════════════════════════════════
+// Supabase 設定
+// ═══════════════════════════════════════════════════
 const SUPABASE_URL = 'https://ehiujfsrneeapfwbxbey.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVoaXVqZnNybmVlYXBmd2J4YmV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1OTUyMTEsImV4cCI6MjA5MjE3MTIxMX0.vf9_TB5ah4XSW1DhLxrm72NwnB5enrPNVQdLTqop4Ow';
 
@@ -240,13 +259,7 @@ const headers = {
     'Authorization': 'Bearer ' + SUPABASE_KEY
 };
 
-// 輔助函式：修正 SQL 傳回的路徑
-function fixPath(path) {
-    if (!path) return "";
-    // 如果路徑以 ./ 開頭，去掉 . 變成從根目錄開始的路徑
-    if (path.startsWith('./')) return path.substring(1);
-    return path;
-}
+// ── Supabase API ─────────────────────────────────
 
 async function fetchQuestions(mode, submode) {
     let url;
@@ -272,14 +285,28 @@ async function upsertStudent(name, className) {
     } catch(e) { throw new Error('NETWORK'); }
 
     if (res.status === 401 || res.status === 403) throw new Error('AUTH');
+    if (res.status === 503 || res.status === 502) throw new Error('SUPABASE_DOWN');
+    if (!res.ok) throw new Error('SERVER:' + res.status);
+
     const data = await res.json();
     if (data.length > 0) return data[0];
 
-    let insertRes = await fetch(`${SUPABASE_URL}/rest/v1/students`, {
-        method:  'POST',
-        headers: { ...headers, 'Prefer': 'return=representation' },
-        body:    JSON.stringify({ name, class_name: className })
-    });
+    let insertRes;
+    try {
+        insertRes = await fetch(
+            `${SUPABASE_URL}/rest/v1/students`,
+            {
+                method:  'POST',
+                headers: { ...headers, 'Prefer': 'return=representation' },
+                body:    JSON.stringify({ name, class_name: className })
+            }
+        );
+    } catch(e) { throw new Error('NETWORK'); }
+
+    if (insertRes.status === 401 || insertRes.status === 403) throw new Error('AUTH');
+    if (insertRes.status === 503 || insertRes.status === 502) throw new Error('SUPABASE_DOWN');
+    if (!insertRes.ok) throw new Error('SERVER:' + insertRes.status);
+
     const inserted = await insertRes.json();
     return inserted[0];
 }
@@ -292,29 +319,40 @@ async function saveRecord(studentId, questionId, mode, isCorrect) {
     }).catch(() => {});
 }
 
+// 完成一輪後，更新 students 表的 last & best 秒數
 async function updateStudentTime(studentId, mode, seconds) {
-    const res  = await fetch(`${SUPABASE_URL}/rest/v1/students?id=eq.${studentId}&select=*`, { headers });
+    const res  = await fetch(
+        `${SUPABASE_URL}/rest/v1/students?id=eq.${studentId}&select=best_vocab_seconds,best_grammar_seconds,last_vocab_seconds,last_grammar_seconds`,
+        { headers }
+    );
     const data = await res.json();
     if (!data.length) return { isNewRecord: false, bestSeconds: null };
 
-    const row = data[0];
-    const isVocab = (mode === 'U6' || mode === 'U7');
-    const bestKey = isVocab ? 'best_vocab_seconds' : 'best_grammar_seconds';
-    const lastKey = isVocab ? 'last_vocab_seconds' : 'last_grammar_seconds';
-    
+    const row     = data[0];
+    // U6 和 U7 共用 vocab 欄位（都算單字模式）
+    const isVocab    = (mode === 'U6' || mode === 'U7');
+    const bestKey    = isVocab ? 'best_vocab_seconds'  : 'best_grammar_seconds';
+    const lastKey    = isVocab ? 'last_vocab_seconds'  : 'last_grammar_seconds';
     const currentBest = row[bestKey];
-    const isNewRecord = (currentBest === null || seconds < currentBest);
-    const newBest = isNewRecord ? seconds : currentBest;
 
-    await fetch(`${SUPABASE_URL}/rest/v1/students?id=eq.${studentId}`, {
-        method:  'PATCH',
-        headers: { ...headers, 'Prefer': 'return=minimal' },
-        body:    JSON.stringify({ [lastKey]: seconds, [bestKey]: newBest })
-    }).catch(() => {});
+    const isNewRecord = (currentBest === null || seconds < currentBest);
+    const newBest     = isNewRecord ? seconds : currentBest;
+
+    await fetch(
+        `${SUPABASE_URL}/rest/v1/students?id=eq.${studentId}`,
+        {
+            method:  'PATCH',
+            headers: { ...headers, 'Prefer': 'return=minimal' },
+            body:    JSON.stringify({ [lastKey]: seconds, [bestKey]: newBest })
+        }
+    ).catch(() => {});
 
     return { isNewRecord, bestSeconds: newBest };
 }
 
+// ═══════════════════════════════════════════════════
+// 計時器
+// ═══════════════════════════════════════════════════
 let timerInterval = null;
 let timerSeconds  = 0;
 
@@ -328,204 +366,399 @@ function startTimer() {
     }, 1000);
 }
 
-function stopTimer() { clearInterval(timerInterval); }
+function stopTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+}
+
 function updateTimerDisplay() {
-    const m = Math.floor(timerSeconds / 60);
-    const s = timerSeconds % 60;
-    const el = document.getElementById('timer-display');
-    el.innerText = m + ':' + String(s).padStart(2, '0');
+    const m   = Math.floor(timerSeconds / 60);
+    const s   = timerSeconds % 60;
+    const str = m + ':' + String(s).padStart(2, '0');
+    const el  = document.getElementById('timer-display');
+    el.innerText = str;
+    // 超過 3 分鐘變橘色警示
     el.className = timerSeconds >= 180 ? 'warning' : '';
 }
+
 function formatTime(seconds) {
-    if (seconds === null) return '—';
+    if (seconds === null || seconds === undefined) return '—';
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return m + ':' + String(s).padStart(2, '0');
 }
 
+// ═══════════════════════════════════════════════════
+// 狀態
+// ═══════════════════════════════════════════════════
 let currentStudent = null;
-let appMode = '';
-let u7SubMode = '';
-let allQuestions = [];
-let currentPool = [];
-let totalRound = 0;
-let correctCount = 0;
+let appMode        = '';
+let u7SubMode      = '';   // 'matching' | 'spelling' | 'mix'
+let allQuestions   = [];
+let currentPool    = [];
+let totalRound     = 0;
+let correctCount   = 0;
 let selectedOption = null;
-let questionMode = 'choice';
+let questionMode   = 'choice';
 
 const correctSound = new Audio('./sound/correct.mp3');
 const wrongSound   = new Audio('./sound/wrong.mp3');
 
+// ═══════════════════════════════════════════════════
+// 畫面切換
+// ═══════════════════════════════════════════════════
 function showScreen(id) {
-    ['loading-screen','login-screen','home-screen','sub-screen','quiz-container'].forEach(s => document.getElementById(s).style.display = 'none');
+    ['loading-screen','login-screen','home-screen','sub-screen','quiz-container']
+        .forEach(s => document.getElementById(s).style.display = 'none');
     document.getElementById(id).style.display = 'block';
 }
 
-function goHome() { stopTimer(); showScreen('home-screen'); }
-
-async function handleLogin() {
-    const name = document.getElementById('student-name').value.trim();
-    const className = document.getElementById('student-class').value.trim();
-    if (!name || !className) return;
-    showScreen('loading-screen');
-    try {
-        currentStudent = await upsertStudent(name, className);
-        document.getElementById('home-student-name').innerText = `👤 ${currentStudent.name}（${currentStudent.class_name}）`;
-        showScreen('home-screen');
-    } catch(e) { showScreen('login-screen'); }
+function goHome() {
+    stopTimer();
+    showScreen('home-screen');
 }
 
+// ═══════════════════════════════════════════════════
+// 登入
+// ═══════════════════════════════════════════════════
+async function handleLogin() {
+    const name      = document.getElementById('student-name').value.trim();
+    const className = document.getElementById('student-class').value.trim();
+    const errBox    = document.getElementById('login-error');
+    errBox.style.display = 'none';
+
+    if (!name)      { errBox.innerText = '請輸入你的名字！';  errBox.style.display = 'block'; return; }
+    if (!className) { errBox.innerText = '請輸入班級！';       errBox.style.display = 'block'; return; }
+
+    document.getElementById('login-btn').disabled = true;
+    showScreen('loading-screen');
+
+    try {
+        currentStudent = await upsertStudent(name, className);
+        document.getElementById('home-student-name').innerText =
+            `👤 ${currentStudent.name}（${currentStudent.class_name}）`;
+        showScreen('home-screen');
+    } catch(e) {
+        document.getElementById('login-btn').disabled = false;
+        const msg = e.message;
+        if (msg === 'NETWORK') {
+            errBox.innerText = '❌ 網路連線失敗，請確認你的網路是否正常。';
+        } else if (msg === 'SUPABASE_DOWN') {
+            errBox.innerText = '⚠️ 伺服器暫時無法使用（Supabase 可能已暫停），請稍後再試或聯絡老師。';
+        } else if (msg === 'AUTH') {
+            errBox.innerText = '🔒 認證失敗，請聯絡老師確認設定。';
+        } else if (msg && msg.startsWith('SERVER:')) {
+            errBox.innerText = `⚠️ 伺服器回傳錯誤（${msg.replace('SERVER:','')}），請聯絡老師。`;
+        } else {
+            errBox.innerText = '❌ 發生未知錯誤，請重新整理頁面再試。';
+        }
+        errBox.style.display = 'block';
+        showScreen('login-screen');
+    }
+}
+
+document.getElementById('student-class').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+});
+
+// ═══════════════════════════════════════════════════
+// 選擇模式
+// ═══════════════════════════════════════════════════
 function goSub(mode) {
     appMode = mode;
+    // 切換按鈕區塊
     const isU7 = mode === 'U7';
-    document.getElementById('sub-normal-btns').style.display = isU7 ? 'none' : 'flex';
-    document.getElementById('sub-u7-btns').style.display = isU7 ? 'block' : 'none';
-    
+    document.getElementById('sub-normal-btns').style.display = isU7 ? 'none'  : 'flex';
+    document.getElementById('sub-u7-btns').style.display     = isU7 ? 'block' : 'none';
+
     if (mode === 'U6') {
-        document.getElementById('sub-icon').innerText = '📖';
+        document.getElementById('sub-icon').innerText  = '📖';
         document.getElementById('sub-title').innerText = 'U6 單字練習';
-    } else if (isU7) {
-        document.getElementById('sub-icon').innerText = '🚌';
+        document.getElementById('sub-desc').innerText  = '醫療健康主題單字，三種題型隨機混合：選擇題、拼字、句子填空。';
+        document.getElementById('sub-tags').innerHTML  =
+            '<span class="tag">選擇題</span><span class="tag">拼字</span><span class="tag">句子填空</span>';
+    } else if (mode === 'U7') {
+        document.getElementById('sub-icon').innerText  = '🚌';
         document.getElementById('sub-title').innerText = 'U7 單字練習';
+        document.getElementById('sub-desc').innerText  = '選擇練習方式：Matching、Spelling 或 Mix（含發音題）。';
+        document.getElementById('sub-tags').innerHTML  =
+            '<span class="tag">train</span><span class="tag">subway</span><span class="tag">ferry</span><span class="tag">taxi</span><span class="tag">helicopter</span><span class="tag">bicycle</span>';
     } else {
-        document.getElementById('sub-icon').innerText = '✏️';
+        document.getElementById('sub-icon').innerText  = '✏️';
         document.getElementById('sub-title').innerText = '文法練習';
+        document.getElementById('sub-desc').innerText  = '四大時態選擇題，每題挑出正確的動詞形式。';
+        document.getElementById('sub-tags').innerHTML  =
+            '<span class="tag">現在簡單式</span><span class="tag">現在進行式</span><span class="tag">過去簡單式</span><span class="tag">過去進行式</span>';
     }
+    document.getElementById('quiz-back-btn').onclick = () => { stopTimer(); goSub(mode); };
     showScreen('sub-screen');
 }
 
-async function startU7(sub) { u7SubMode = sub; await startGame(); }
+// U7 子模式入口
+async function startU7(submode) {
+    u7SubMode = submode;
+    await startGame();
+}
 
+// ═══════════════════════════════════════════════════
+// 開始遊戲
+// ═══════════════════════════════════════════════════
 async function startGame() {
     showScreen('loading-screen');
     try {
         allQuestions = await fetchQuestions(appMode, u7SubMode);
-        totalRound = appMode === 'grammar' ? 10 : 16;
-        currentPool = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, totalRound);
-        correctCount = 0;
-        document.getElementById('quiz-mode-label').innerText = appMode + (u7SubMode ? ' - ' + u7SubMode : '');
-        showScreen('quiz-container');
-        startTimer();
-        loadQuestion();
-    } catch(e) { goSub(appMode); }
+    } catch(e) {
+        alert('題目載入失敗，請確認網路連線。');
+        showScreen('sub-screen');
+        return;
+    }
+
+    totalRound   = appMode === 'grammar' ? 10 : 16;
+    currentPool  = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, totalRound);
+    correctCount = 0;
+
+    const subLabel = u7SubMode ? ` — ${u7SubMode.charAt(0).toUpperCase()+u7SubMode.slice(1)}` : '';
+    const modeLabel = appMode === 'U6' ? '📖 U6 單字' : appMode === 'U7' ? `🚌 U7 單字${subLabel}` : '✏️ 文法練習';
+    document.getElementById('quiz-mode-label').innerText = modeLabel;
+    document.getElementById('progress-fill').style.width = '0%';
+    document.getElementById('game-zone').style.display   = 'block';
+    document.getElementById('result-zone').style.display = 'none';
+    document.getElementById('retry-btn').onclick = startGame;
+
+    showScreen('quiz-container');
+
+    // 開始計時
+    startTimer();
+    loadQuestion();
 }
 
+// ═══════════════════════════════════════════════════
+// 載入題目
+// ═══════════════════════════════════════════════════
 function loadQuestion() {
-    if (!currentPool.length) { finishGame(); return; }
-    const q = currentPool[0];
-    document.getElementById('q-counter').innerText = `題目 ${totalRound - currentPool.length + 1} / ${totalRound}`;
-    document.getElementById('feedback').innerText = '';
-    document.getElementById('user-input').value = '';
-    document.getElementById('submit-btn').disabled = true;
-    document.getElementById('main-image').style.display = 'none';
-    document.getElementById('options').innerHTML = '';
-    document.getElementById('input-zone').style.display = 'none';
+    if (currentPool.length === 0) { finishGame(); return; }
+
+    const done = totalRound - currentPool.length;
+    document.getElementById('q-counter').innerText = `題目 ${done + 1} / ${totalRound}`;
+
+    document.getElementById('feedback').innerText        = '';
+    document.getElementById('feedback').style.color      = '#333';
+    document.getElementById('user-input').value          = '';
+    document.getElementById('user-input').oninput        = null;
+    document.getElementById('user-input').disabled       = false;
+    document.getElementById('submit-btn').disabled       = true;
+    document.getElementById('main-image').style.display  = 'none';
+    document.getElementById('sentence-hint').innerHTML   = '';
+    document.getElementById('tense-tag-wrap').innerHTML  = '';
+    document.getElementById('options').innerHTML         = '';
+    document.getElementById('input-zone').style.display  = 'none';
     selectedOption = null;
 
-    if (appMode === 'grammar') loadGrammarQuestion();
-    else if (q.type === 'match_img2word' || q.type === 'match_word2img') loadMatchingQuestion();
-    else if (q.type === 'spelling') loadSpellingQuestion();
-    else if (q.type === 'phonics') loadPhonicsQuestion();
-    else loadVocabQuestion();
+    if (appMode === 'grammar') {
+        loadGrammarQuestion();
+    } else if (appMode === 'U7') {
+        const type = currentPool[0].type;
+        if (type === 'match_img2word' || type === 'match_word2img') loadMatchingQuestion();
+        else if (type === 'spelling')  loadSpellingQuestion();
+        else if (type === 'phonics')   loadPhonicsQuestion();
+        else                           loadVocabQuestion();
+    } else {
+        loadVocabQuestion();
+    }
 }
 
+// ── 單字題 ──────────────────────────────────────────
 function loadVocabQuestion() {
-    const q = currentPool[0];
-    const modes = ['choice', 'spelling', 'sentence'];
+    const q      = currentPool[0];
+    const modes  = ['choice', 'spelling', 'sentence'];
     questionMode = modes[Math.floor(Math.random() * modes.length)];
-    
-    // 修正路徑並顯示圖片
-    const imgEl = document.getElementById('main-image');
-    imgEl.src = fixPath(q.image_path);
-    imgEl.style.display = 'block';
 
-    const opts = typeof q.options === 'string' ? JSON.parse(q.options) : q.options;
+    let finalPath = q.image_path;
+if (finalPath && finalPath.startsWith('./')) {
+    finalPath = finalPath.substring(1); // 把 "." 去掉，變成 "/U7images/..."
+}
+document.getElementById('main-image').src = finalPath;
+    document.getElementById('main-image').style.display = 'block';
+
+    const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options);
+
     if (questionMode === 'choice') {
         setTypeBadge('選擇題', 'badge-choice');
+        document.getElementById('question-type-text').innerText = '看圖，選出正確的答案';
         renderOptions(opts, q.answer);
-    } else {
-        setTypeBadge(questionMode === 'spelling' ? '拼字題' : '句子填空', 'badge-spelling');
-        document.getElementById('sentence-hint').innerText = q.question_text;
+    }
+    else if (questionMode === 'spelling') {
+        setTypeBadge('拼字題', 'badge-spelling');
+        document.getElementById('question-type-text').innerText = '請拼出這個單字的正確拼法';
+        // 喇叭按鈕
+        const speakBtn = document.createElement('button');
+        speakBtn.className   = 'speak-btn';
+        speakBtn.title       = '播放發音';
+        speakBtn.innerHTML   = '🔊';
+        speakBtn.onclick     = () => speak(q.answer);
+        const hintDiv = document.getElementById('sentence-hint');
+        hintDiv.innerHTML = '';
+        hintDiv.appendChild(speakBtn);
+        // 中文提示（從 question_text 來）
+        const hintText = document.createElement('div');
+        hintText.style.marginTop = '6px';
+        hintText.innerText = q.question_text;
+        hintDiv.appendChild(hintText);
+        showInput();
+    }
+    else {
+        setTypeBadge('句子填空', 'badge-sentence');
+        document.getElementById('question-type-text').innerText = '完成填空';
+        if (q.grp === 'symptom') {
+            document.getElementById('sentence-hint').innerHTML =
+                `She has a <span class="highlight">${makeCloze(q.noun)}</span>. She should go to the doctor.`;
+        } else {
+            const actionWithBlank = q.answer.replace(
+                new RegExp('\\b' + q.sentence_noun + '\\b', 'gi'),
+                `<span class="highlight">${makeCloze(q.sentence_noun)}</span>`
+            );
+            document.getElementById('sentence-hint').innerHTML =
+                `She has ${q.symptom}. She should ${actionWithBlank}.`;
+        }
         showInput();
     }
 }
 
+// ── 文法題 ──────────────────────────────────────────
 function loadGrammarQuestion() {
     const q = currentPool[0];
     setTypeBadge('文法選擇', 'badge-grammar');
-    document.getElementById('sentence-hint').innerHTML = q.question_text.replace('___', '<span class="highlight">___</span>');
-    const opts = typeof q.options === 'string' ? JSON.parse(q.options) : q.options;
+    document.getElementById('question-type-text').innerText = '選出正確的動詞形式';
+    document.getElementById('sentence-hint').innerHTML =
+        q.question_text.replace('___', '<span class="highlight">___</span>');
+    const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options);
     renderOptions(opts, q.answer, true);
 }
 
+// ── Matching：看圖選字 ───────────────────────────────
 function loadMatchingQuestion() {
-    const q = currentPool[0];
-    const opts = typeof q.options === 'string' ? JSON.parse(q.options) : q.options;
+    const q    = currentPool[0];
+    const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options);
+
     if (q.type === 'match_img2word') {
-        setTypeBadge('Matching', 'badge-choice');
-        const imgEl = document.getElementById('main-image');
-        imgEl.src = fixPath(q.image_path);
-        imgEl.style.display = 'block';
+        setTypeBadge('Matching — 看圖選字', 'badge-choice');
+        document.getElementById('question-type-text').innerText = q.question_text;
+        if (q.image_path) {
+            let finalPath = q.image_path;
+if (finalPath && finalPath.startsWith('./')) {
+    finalPath = finalPath.substring(1); // 把 "." 去掉，變成 "/U7images/..."
+}
+document.getElementById('main-image').src = finalPath;
+            document.getElementById('main-image').style.display = 'block';
+        }
         renderOptions(opts, q.answer);
     } else {
-        setTypeBadge('Matching', 'badge-choice');
-        document.getElementById('sentence-hint').innerText = q.question_text;
+        // match_word2img：出文字，選圖片
+        setTypeBadge('Matching — 看字選圖', 'badge-choice');
+        document.getElementById('question-type-text').innerText = q.question_text;
         renderImgOptions(opts, q.answer);
     }
 }
 
+// ── Spelling：純拼字 ────────────────────────────────
 function loadSpellingQuestion() {
     const q = currentPool[0];
     setTypeBadge('Spelling', 'badge-spelling');
-    const imgEl = document.getElementById('main-image');
-    imgEl.src = fixPath(q.image_path);
-    imgEl.style.display = 'block';
-    document.getElementById('sentence-hint').innerText = q.question_text;
+    document.getElementById('question-type-text').innerText = '';
+
+    const hintDiv = document.getElementById('sentence-hint');
+    hintDiv.innerHTML = '';
+
+    // 喇叭按鈕
+    const speakBtn    = document.createElement('button');
+    speakBtn.className = 'speak-btn';
+    speakBtn.title     = '播放發音';
+    speakBtn.innerHTML = '🔊';
+    speakBtn.onclick   = () => speak(q.answer);
+    hintDiv.appendChild(speakBtn);
+
+    // 中文提示
+    const hint = document.createElement('div');
+    hint.style.marginTop  = '8px';
+    hint.style.fontSize   = '16px';
+    hint.style.color      = '#555';
+    hint.innerText = q.question_text;
+    hintDiv.appendChild(hint);
+
+    // 顯示圖片（如果有）
+    if (q.image_path) {
+        let finalPath = q.image_path;
+if (finalPath && finalPath.startsWith('./')) {
+    finalPath = finalPath.substring(1); // 把 "." 去掉，變成 "/U7images/..."
+}
+document.getElementById('main-image').src = finalPath;
+        document.getElementById('main-image').style.display = 'block';
+    }
     showInput();
 }
 
+// ── Phonics：發音題 ─────────────────────────────────
 function loadPhonicsQuestion() {
-    const q = currentPool[0];
+    const q    = currentPool[0];
+    const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options);
     setTypeBadge('發音題', 'badge-phonics');
-    document.getElementById('sentence-hint').innerText = q.question_text;
-    const opts = typeof q.options === 'string' ? JSON.parse(q.options) : q.options;
+    document.getElementById('question-type-text').innerText = '';
+    document.getElementById('sentence-hint').innerHTML =
+        `<span style="font-size:18px;font-weight:700;color:#333;">${q.question_text}</span>`;
     renderOptions(opts, q.answer, true);
 }
 
-function setTypeBadge(t, c) {
-    const b = document.getElementById('type-badge');
-    b.innerText = t; b.className = 'type-badge ' + c;
+// ═══════════════════════════════════════════════════
+// 共用 UI
+// ═══════════════════════════════════════════════════
+function setTypeBadge(text, cls) {
+    const el = document.getElementById('type-badge');
+    el.innerText = text;
+    el.className = 'type-badge ' + cls;
 }
 
-function renderOptions(opts, ans, single) {
+function renderOptions(opts, answer, singleCol) {
     const div = document.getElementById('options');
-    div.className = 'options-grid' + (single ? ' single-col' : '');
-    opts.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'opt'; btn.innerText = opt;
-        btn.onclick = () => {
+    div.className = 'options-grid' + (singleCol ? ' single-col' : '');
+    div.innerHTML = '';
+    const maxLen = Math.max(...opts.map(o => o.length));
+    if (maxLen > 12) div.classList.add('single-col');
+
+    [...opts].sort(() => 0.5 - Math.random()).forEach(opt => {
+        const btn     = document.createElement('button');
+        btn.className = 'opt';
+        btn.innerText = opt;
+        btn.onclick   = () => {
+            speak(opt);
+            document.querySelectorAll('.opt').forEach(b => {
+                b.style.backgroundColor = 'white';
+                b.style.borderColor     = '#e5e5e5';
+            });
+            btn.style.backgroundColor = '#ddf4ff';
+            btn.style.borderColor     = '#1cb0f6';
             selectedOption = opt;
-            document.querySelectorAll('.opt').forEach(b => b.style.borderColor = '#e5e5e5');
-            btn.style.borderColor = '#1cb0f6';
             document.getElementById('submit-btn').disabled = false;
         };
         div.appendChild(btn);
     });
 }
 
-function renderImgOptions(opts, ans) {
+// 看字選圖：圖片選項
+function renderImgOptions(opts, answer) {
     const div = document.getElementById('options');
     div.className = 'img-options-grid';
-    opts.forEach(path => {
+    div.innerHTML = '';
+    [...opts].sort(() => 0.5 - Math.random()).forEach(imgPath => {
         const btn = document.createElement('button');
         btn.className = 'img-opt-btn';
-        const img = document.createElement('img');
-        img.src = fixPath(path);
+        const img  = document.createElement('img');
+        img.src    = imgPath;
+        img.alt    = '';
         btn.appendChild(img);
         btn.onclick = () => {
-            selectedOption = path;
             document.querySelectorAll('.img-opt-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
+            selectedOption = imgPath;
             document.getElementById('submit-btn').disabled = false;
         };
         div.appendChild(btn);
@@ -534,58 +767,173 @@ function renderImgOptions(opts, ans) {
 
 function showInput() {
     document.getElementById('input-zone').style.display = 'block';
-    const i = document.getElementById('user-input');
-    i.oninput = () => {
-        selectedOption = i.value.trim();
-        document.getElementById('submit-btn').disabled = !selectedOption;
+    const input = document.getElementById('user-input');
+    input.focus();
+    input.oninput = () => {
+        selectedOption = input.value.trim();
+        document.getElementById('submit-btn').disabled = selectedOption.length === 0;
     };
 }
 
-document.getElementById('submit-btn').onclick = async function() {
-    const q = currentPool[0];
-    let isCorrect = false;
-    const user = (selectedOption || "").toLowerCase().trim();
-    const target = q.answer.toLowerCase().trim();
+function makeCloze(word) {
+    if (!word) return '';
+    return word.split(' ').map(w => w[0] + '_'.repeat(w.length - 1)).join(' ');
+}
 
-    if (q.type === 'match_word2img') {
-        // 比對檔名
-        const getFile = p => p.split('/').pop();
-        isCorrect = getFile(selectedOption) === getFile(q.answer);
-    } else if (questionMode === 'spelling' || q.type === 'spelling') {
-        const norm = s => s.replace('é','e');
-        isCorrect = norm(user) === norm(target);
-    } else {
-        isCorrect = user === target;
+// ═══════════════════════════════════════════════════
+// 提交答案
+// ═══════════════════════════════════════════════════
+document.getElementById('submit-btn').onclick = async function() {
+    const q       = currentPool[0];
+    const userAns = (selectedOption || '').toLowerCase().trim();
+    let isCorrect      = false;
+    let correctDisplay = '';
+
+    document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+    document.getElementById('user-input').disabled = true;
+    this.disabled = true;
+
+    if (appMode === 'grammar') {
+        isCorrect      = userAns === q.answer.toLowerCase();
+        correctDisplay = q.answer;
+        document.querySelectorAll('.opt').forEach(b => {
+            if (b.innerText.toLowerCase() === q.answer.toLowerCase()) b.classList.add('correct');
+            else if (b.innerText === selectedOption)                  b.classList.add('wrong');
+        });
     }
+    else if (q.type === 'match_img2word' || q.type === 'phonics') {
+        isCorrect      = userAns === q.answer.toLowerCase();
+        correctDisplay = q.answer;
+        document.querySelectorAll('.opt').forEach(b => {
+            if (b.innerText.toLowerCase() === q.answer.toLowerCase()) b.classList.add('correct');
+            else if (b.innerText === selectedOption)                  b.classList.add('wrong');
+        });
+    }
+    else if (q.type === 'match_word2img') {
+        const normalize = p => (p || '').split('/').pop();
+        isCorrect      = normalize(selectedOption) === normalize(q.answer);
+        correctDisplay = q.noun || q.answer;
+        document.querySelectorAll('.img-opt-btn').forEach(b => {
+            const src = b.querySelector('img') ? b.querySelector('img').src : '';
+            if (normalize(src) === normalize(q.answer))  b.classList.add('correct');
+            else if (b.classList.contains('selected'))   b.classList.add('wrong');
+            b.disabled = true;
+        });
+    }
+    else if (q.type === 'spelling') {
+        const normalize = s => s.toLowerCase().replace('é','e').trim();
+        isCorrect      = normalize(userAns) === normalize(q.answer);
+        correctDisplay = q.answer;
+    }
+    else if (questionMode === 'choice') {
+        isCorrect      = userAns === q.answer.toLowerCase();
+        correctDisplay = q.answer;
+        document.querySelectorAll('.opt').forEach(b => {
+            if (b.innerText.toLowerCase() === q.answer.toLowerCase()) b.classList.add('correct');
+            else if (b.innerText === selectedOption)                  b.classList.add('wrong');
+        });
+    }
+    else if (questionMode === 'spelling') {
+        const normalize = s => s.toLowerCase().replace('é','e').trim();
+        isCorrect      = normalize(userAns) === normalize(q.noun);
+        correctDisplay = q.noun;
+    }
+    else {
+        const target   = (q.grp === 'symptom') ? q.noun : q.sentence_noun;
+        isCorrect      = userAns === target.toLowerCase();
+        correctDisplay = target;
+    }
+
+    // 儲存記錄（mode 統一存 'vocab' 或 'grammar'）
+    const recordMode = (appMode === 'U6' || appMode === 'U7') ? 'vocab' : 'grammar';
+    saveRecord(currentStudent.id, q.id, recordMode, isCorrect);
 
     const fb = document.getElementById('feedback');
     if (isCorrect) {
-        fb.innerText = '答對了！'; fb.style.color = 'green';
-        correctCount++; currentPool.shift();
+        correctSound.play().catch(() => {});
+        fb.innerText   = '太棒了！✨';
+        fb.style.color = '#58cc02';
+        currentPool.shift();
+        correctCount++;
+        updateProgress();
+        setTimeout(nextQ, 1500);
     } else {
-        fb.innerText = '錯了，答案是: ' + q.answer; fb.style.color = 'red';
-        currentPool.push(currentPool.shift());
+        wrongSound.play().catch(() => {});
+        fb.innerText   = `不對喔，正確答案是: ${correctDisplay}`;
+        fb.style.color = '#ff4b4b';
+        let failed = currentPool.shift();
+        currentPool.push(failed);
+        setTimeout(nextQ, 2500);
     }
-    document.getElementById('progress-fill').style.width = (correctCount/totalRound*100)+'%';
-    setTimeout(loadQuestion, 1500);
 };
 
+function nextQ() {
+    document.getElementById('user-input').disabled = false;
+    loadQuestion();
+}
+
+function updateProgress() {
+    document.getElementById('progress-fill').style.width = (correctCount / totalRound * 100) + '%';
+}
+
+// ═══════════════════════════════════════════════════
+// 完成一輪：停計時、存紀錄、顯示結果
+// ═══════════════════════════════════════════════════
 async function finishGame() {
     stopTimer();
-    const res = await updateStudentTime(currentStudent.id, appMode, timerSeconds);
-    document.getElementById('game-zone').style.display = 'none';
+    const elapsed = timerSeconds;
+
+    // 更新 Supabase students 表，取回是否刷新紀錄
+    const { isNewRecord, bestSeconds } = await updateStudentTime(
+        currentStudent.id, appMode, elapsed
+    );
+
+    // 同步更新本地 currentStudent（讓再試一次能拿到最新 best）
+    const bestKey = appMode === 'vocab' ? 'best_vocab_seconds' : 'best_grammar_seconds';
+    currentStudent[bestKey] = bestSeconds;
+
+    showResult(elapsed, bestSeconds, isNewRecord);
+}
+
+// ═══════════════════════════════════════════════════
+// 結果頁
+// ═══════════════════════════════════════════════════
+function showResult(elapsed, bestSeconds, isNewRecord) {
+    const pct = Math.round(correctCount / totalRound * 100);
+    let emoji = '🎉', msg = '';
+    if      (pct === 100) { emoji = '🏆'; msg = '完美！全部答對，太厲害了！'; }
+    else if (pct >= 80)   { emoji = '🌟'; msg = '非常好！繼續保持！'; }
+    else if (pct >= 60)   { emoji = '👍'; msg = '不錯喔！再多練習幾次！'; }
+    else                  { emoji = '💪'; msg = '繼續努力，每次都有進步！'; }
+
+    document.getElementById('result-emoji').innerText   = emoji;
+    document.getElementById('result-score').innerText   = correctCount + ' / ' + totalRound;
+    document.getElementById('result-msg').innerText     = msg;
+    document.getElementById('result-time').innerText    = formatTime(elapsed);
+    document.getElementById('result-best-time').innerText = formatTime(bestSeconds);
+    document.getElementById('progress-fill').style.width = '100%';
+
+    // 刷新紀錄橫幅
+    const banner = document.getElementById('new-record-banner');
+    banner.className = 'new-record-banner' + (isNewRecord ? ' show' : '');
+
+    document.getElementById('game-zone').style.display   = 'none';
     document.getElementById('result-zone').style.display = 'block';
-    document.getElementById('result-score').innerText = correctCount + ' / ' + totalRound;
-    document.getElementById('result-time').innerText = formatTime(timerSeconds);
-    document.getElementById('result-best-time').innerText = formatTime(res.bestSeconds);
-    if (res.isNewRecord) document.getElementById('new-record-banner').style.display = 'block';
 }
 
-function speak(t) {
-    const u = new SpeechSynthesisUtterance(t);
-    u.lang = 'en-US'; window.speechSynthesis.speak(u);
+// ═══════════════════════════════════════════════════
+// 語音
+// ═══════════════════════════════════════════════════
+function speak(text) {
+    try {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US';
+        window.speechSynthesis.speak(u);
+    } catch(e) {}
 }
 
+// 啟動
 showScreen('login-screen');
 </script>
 </body>
