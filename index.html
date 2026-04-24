@@ -276,22 +276,37 @@ async function fetchQuestions(mode, submode) {
 }
 
 async function upsertStudent(name, className) {
-    const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/students?name=eq.${encodeURIComponent(name)}&class_name=eq.${encodeURIComponent(className)}&select=*`,
-        { headers }
-    );
+    let res;
+    try {
+        res = await fetch(
+            `${SUPABASE_URL}/rest/v1/students?name=eq.${encodeURIComponent(name)}&class_name=eq.${encodeURIComponent(className)}&select=*`,
+            { headers }
+        );
+    } catch(e) { throw new Error('NETWORK'); }
+
+    if (res.status === 401 || res.status === 403) throw new Error('AUTH');
+    if (res.status === 503 || res.status === 502) throw new Error('SUPABASE_DOWN');
+    if (!res.ok) throw new Error('SERVER:' + res.status);
+
     const data = await res.json();
     if (data.length > 0) return data[0];
 
-    const insertRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/students`,
-        {
-            method:  'POST',
-            headers: { ...headers, 'Prefer': 'return=representation' },
-            body:    JSON.stringify({ name, class_name: className })
-        }
-    );
-    if (!insertRes.ok) throw new Error('學生資料建立失敗');
+    let insertRes;
+    try {
+        insertRes = await fetch(
+            `${SUPABASE_URL}/rest/v1/students`,
+            {
+                method:  'POST',
+                headers: { ...headers, 'Prefer': 'return=representation' },
+                body:    JSON.stringify({ name, class_name: className })
+            }
+        );
+    } catch(e) { throw new Error('NETWORK'); }
+
+    if (insertRes.status === 401 || insertRes.status === 403) throw new Error('AUTH');
+    if (insertRes.status === 503 || insertRes.status === 502) throw new Error('SUPABASE_DOWN');
+    if (!insertRes.ok) throw new Error('SERVER:' + insertRes.status);
+
     const inserted = await insertRes.json();
     return inserted[0];
 }
@@ -425,7 +440,18 @@ async function handleLogin() {
         showScreen('home-screen');
     } catch(e) {
         document.getElementById('login-btn').disabled = false;
-        errBox.innerText = '連線失敗，請確認網路後再試。';
+        const msg = e.message;
+        if (msg === 'NETWORK') {
+            errBox.innerText = '❌ 網路連線失敗，請確認你的網路是否正常。';
+        } else if (msg === 'SUPABASE_DOWN') {
+            errBox.innerText = '⚠️ 伺服器暫時無法使用（Supabase 可能已暫停），請稍後再試或聯絡老師。';
+        } else if (msg === 'AUTH') {
+            errBox.innerText = '🔒 認證失敗，請聯絡老師確認設定。';
+        } else if (msg && msg.startsWith('SERVER:')) {
+            errBox.innerText = `⚠️ 伺服器回傳錯誤（${msg.replace('SERVER:','')}），請聯絡老師。`;
+        } else {
+            errBox.innerText = '❌ 發生未知錯誤，請重新整理頁面再試。';
+        }
         errBox.style.display = 'block';
         showScreen('login-screen');
     }
