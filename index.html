@@ -31,10 +31,26 @@
         .home-title   { font-size: 26px; font-weight: 700; color: #333; margin-bottom: 6px; }
         .home-sub     { font-size: 15px; color: #999; margin-bottom: 8px; }
         .home-student { font-size: 15px; color: #1cb0f6; font-weight: 600; margin-bottom: 20px; }
-        .mode-btn     { display: block; width: 100%; padding: 20px; margin-bottom: 14px; border: none; border-radius: 16px; font-size: 20px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
+        /* 三個並排按鈕 */
+        .mode-btn-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 0; }
+        .mode-btn     { display: block; width: 100%; padding: 18px 8px; border: none; border-radius: 16px; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; line-height: 1.4; }
         .mode-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
-        .btn-vocab    { background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; }
+        .btn-u6vocab  { background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; }
+        .btn-u7vocab  { background: linear-gradient(135deg, #f7971e, #ffd200); color: white; }
         .btn-grammar  { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
+        /* 喇叭按鈕（拼字題） */
+        .speak-btn { background: none; border: 2px solid #1cb0f6; border-radius: 50%; width: 44px; height: 44px; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px; transition: background 0.15s; }
+        .speak-btn:hover { background: #ddf4ff; }
+        /* Matching 看字選圖：圖片選項網格 */
+        .img-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        .img-opt-btn { padding: 6px; border: 3px solid #e5e5e5; border-radius: 12px; background: white; cursor: pointer; transition: 0.15s; }
+        .img-opt-btn img { width: 100%; height: 100px; object-fit: cover; border-radius: 8px; display: block; }
+        .img-opt-btn:hover:not(:disabled) { border-color: #1cb0f6; }
+        .img-opt-btn.selected { border-color: #1cb0f6; background: #ddf4ff; }
+        .img-opt-btn.correct  { border-color: #58cc02 !important; background: #d7ffb8; }
+        .img-opt-btn.wrong    { border-color: #ff4b4b !important; background: #ffdfe0; }
+        /* 發音題 badge */
+        .badge-phonics { background: #fff0f5; color: #c0392b; }
 
         /* ── 子選單 ── */
         #sub-screen { background: white; padding: 28px 24px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; display: none; }
@@ -140,8 +156,11 @@
         <div class="home-title">互動語言練習</div>
         <div class="home-sub">選擇練習模式，開始學習！</div>
         <div class="home-student" id="home-student-name"></div>
-        <button class="mode-btn btn-vocab"   onclick="goSub('vocab')">📖 單字練習</button>
-        <button class="mode-btn btn-grammar" onclick="goSub('grammar')">✏️ 文法練習</button>
+        <div class="mode-btn-row">
+            <button class="mode-btn btn-u6vocab"  onclick="goSub('U6')">📖<br>U6<br>單字</button>
+            <button class="mode-btn btn-u7vocab"  onclick="goSub('U7')">🚌<br>U7<br>單字</button>
+            <button class="mode-btn btn-grammar"  onclick="goSub('grammar')">✏️<br>文法<br>練習</button>
+        </div>
     </div>
 
     <!-- ③ 子選單 -->
@@ -150,9 +169,19 @@
         <div class="sub-title" id="sub-title"></div>
         <div class="sub-desc"  id="sub-desc"></div>
         <div class="tag-row"   id="sub-tags"></div>
-        <div class="sub-btns">
+        <!-- 一般模式按鈕（U6 / 文法） -->
+        <div class="sub-btns" id="sub-normal-btns">
             <button class="btn-start"  onclick="startGame()">▶ Start</button>
             <button class="btn-return" onclick="goHome()">Return</button>
+        </div>
+        <!-- U7 專屬三選項 -->
+        <div id="sub-u7-btns" style="display:none">
+            <div class="mode-btn-row" style="margin-bottom:14px;">
+                <button class="mode-btn" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb);color:white;" onclick="startU7('matching')">🎯<br>Matching</button>
+                <button class="mode-btn" style="background:linear-gradient(135deg,#f7971e,#ffd200);color:white;" onclick="startU7('spelling')">🔤<br>Spelling</button>
+                <button class="mode-btn" style="background:linear-gradient(135deg,#43e97b,#38f9d7);color:white;" onclick="startU7('mix')">🎲<br>Mix</button>
+            </div>
+            <button class="btn-return" onclick="goHome()" style="width:100%;">Return</button>
         </div>
     </div>
 
@@ -232,11 +261,16 @@ const headers = {
 
 // ── Supabase API ─────────────────────────────────
 
-async function fetchQuestions(mode) {
-    const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/questions?mode=eq.${mode}&select=*`,
-        { headers }
-    );
+async function fetchQuestions(mode, submode) {
+    let url;
+    if (mode === 'grammar') {
+        url = `${SUPABASE_URL}/rest/v1/questions?mode=eq.grammar&select=*`;
+    } else if (mode === 'U7' && submode) {
+        url = `${SUPABASE_URL}/rest/v1/questions?mode=eq.vocab&unit=eq.U7&submode=eq.${submode}&select=*`;
+    } else {
+        url = `${SUPABASE_URL}/rest/v1/questions?mode=eq.vocab&unit=eq.${mode}&select=*`;
+    }
+    const res = await fetch(url, { headers });
     if (!res.ok) throw new Error('題目載入失敗');
     return await res.json();
 }
@@ -272,7 +306,6 @@ async function saveRecord(studentId, questionId, mode, isCorrect) {
 
 // 完成一輪後，更新 students 表的 last & best 秒數
 async function updateStudentTime(studentId, mode, seconds) {
-    // 先拿目前的 best
     const res  = await fetch(
         `${SUPABASE_URL}/rest/v1/students?id=eq.${studentId}&select=best_vocab_seconds,best_grammar_seconds,last_vocab_seconds,last_grammar_seconds`,
         { headers }
@@ -280,24 +313,22 @@ async function updateStudentTime(studentId, mode, seconds) {
     const data = await res.json();
     if (!data.length) return { isNewRecord: false, bestSeconds: null };
 
-    const row        = data[0];
-    const bestKey    = mode === 'vocab' ? 'best_vocab_seconds'   : 'best_grammar_seconds';
-    const lastKey    = mode === 'vocab' ? 'last_vocab_seconds'   : 'last_grammar_seconds';
+    const row     = data[0];
+    // U6 和 U7 共用 vocab 欄位（都算單字模式）
+    const isVocab    = (mode === 'U6' || mode === 'U7');
+    const bestKey    = isVocab ? 'best_vocab_seconds'  : 'best_grammar_seconds';
+    const lastKey    = isVocab ? 'last_vocab_seconds'  : 'last_grammar_seconds';
     const currentBest = row[bestKey];
 
     const isNewRecord = (currentBest === null || seconds < currentBest);
     const newBest     = isNewRecord ? seconds : currentBest;
 
-    // PATCH 更新
     await fetch(
         `${SUPABASE_URL}/rest/v1/students?id=eq.${studentId}`,
         {
             method:  'PATCH',
             headers: { ...headers, 'Prefer': 'return=minimal' },
-            body:    JSON.stringify({
-                [lastKey]: seconds,
-                [bestKey]: newBest
-            })
+            body:    JSON.stringify({ [lastKey]: seconds, [bestKey]: newBest })
         }
     ).catch(() => {});
 
@@ -347,6 +378,7 @@ function formatTime(seconds) {
 // ═══════════════════════════════════════════════════
 let currentStudent = null;
 let appMode        = '';
+let u7SubMode      = '';   // 'matching' | 'spelling' | 'mix'
 let allQuestions   = [];
 let currentPool    = [];
 let totalRound     = 0;
@@ -408,12 +440,23 @@ document.getElementById('student-class').addEventListener('keydown', e => {
 // ═══════════════════════════════════════════════════
 function goSub(mode) {
     appMode = mode;
-    if (mode === 'vocab') {
+    // 切換按鈕區塊
+    const isU7 = mode === 'U7';
+    document.getElementById('sub-normal-btns').style.display = isU7 ? 'none'  : 'flex';
+    document.getElementById('sub-u7-btns').style.display     = isU7 ? 'block' : 'none';
+
+    if (mode === 'U6') {
         document.getElementById('sub-icon').innerText  = '📖';
-        document.getElementById('sub-title').innerText = '單字練習';
+        document.getElementById('sub-title').innerText = 'U6 單字練習';
         document.getElementById('sub-desc').innerText  = '醫療健康主題單字，三種題型隨機混合：選擇題、拼字、句子填空。';
         document.getElementById('sub-tags').innerHTML  =
             '<span class="tag">選擇題</span><span class="tag">拼字</span><span class="tag">句子填空</span>';
+    } else if (mode === 'U7') {
+        document.getElementById('sub-icon').innerText  = '🚌';
+        document.getElementById('sub-title').innerText = 'U7 單字練習';
+        document.getElementById('sub-desc').innerText  = '選擇練習方式：Matching、Spelling 或 Mix（含發音題）。';
+        document.getElementById('sub-tags').innerHTML  =
+            '<span class="tag">train</span><span class="tag">subway</span><span class="tag">ferry</span><span class="tag">taxi</span><span class="tag">helicopter</span><span class="tag">bicycle</span>';
     } else {
         document.getElementById('sub-icon').innerText  = '✏️';
         document.getElementById('sub-title').innerText = '文法練習';
@@ -425,24 +468,32 @@ function goSub(mode) {
     showScreen('sub-screen');
 }
 
+// U7 子模式入口
+async function startU7(submode) {
+    u7SubMode = submode;
+    await startGame();
+}
+
 // ═══════════════════════════════════════════════════
 // 開始遊戲
 // ═══════════════════════════════════════════════════
 async function startGame() {
     showScreen('loading-screen');
     try {
-        allQuestions = await fetchQuestions(appMode);
+        allQuestions = await fetchQuestions(appMode, u7SubMode);
     } catch(e) {
         alert('題目載入失敗，請確認網路連線。');
         showScreen('sub-screen');
         return;
     }
 
-    totalRound   = appMode === 'vocab' ? 16 : 10;
+    totalRound   = appMode === 'grammar' ? 10 : 16;
     currentPool  = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, totalRound);
     correctCount = 0;
 
-    document.getElementById('quiz-mode-label').innerText = appMode === 'vocab' ? '📖 單字練習' : '✏️ 文法練習';
+    const subLabel = u7SubMode ? ` — ${u7SubMode.charAt(0).toUpperCase()+u7SubMode.slice(1)}` : '';
+    const modeLabel = appMode === 'U6' ? '📖 U6 單字' : appMode === 'U7' ? `🚌 U7 單字${subLabel}` : '✏️ 文法練習';
+    document.getElementById('quiz-mode-label').innerText = modeLabel;
     document.getElementById('progress-fill').style.width = '0%';
     document.getElementById('game-zone').style.display   = 'block';
     document.getElementById('result-zone').style.display = 'none';
@@ -477,8 +528,17 @@ function loadQuestion() {
     document.getElementById('input-zone').style.display  = 'none';
     selectedOption = null;
 
-    if (appMode === 'vocab') loadVocabQuestion();
-    else                     loadGrammarQuestion();
+    if (appMode === 'grammar') {
+        loadGrammarQuestion();
+    } else if (appMode === 'U7') {
+        const type = currentPool[0].type;
+        if (type === 'match_img2word' || type === 'match_word2img') loadMatchingQuestion();
+        else if (type === 'spelling')  loadSpellingQuestion();
+        else if (type === 'phonics')   loadPhonicsQuestion();
+        else                           loadVocabQuestion();
+    } else {
+        loadVocabQuestion();
+    }
 }
 
 // ── 單字題 ──────────────────────────────────────────
@@ -499,11 +559,21 @@ function loadVocabQuestion() {
     }
     else if (questionMode === 'spelling') {
         setTypeBadge('拼字題', 'badge-spelling');
-        document.getElementById('question-type-text').innerText = '請拼出關鍵字（名詞）';
-        document.getElementById('sentence-hint').innerHTML = q.answer.replace(
-            new RegExp(q.noun, 'gi'),
-            `<span class="highlight">${makeCloze(q.noun)}</span>`
-        );
+        document.getElementById('question-type-text').innerText = '請拼出這個單字的正確拼法';
+        // 喇叭按鈕
+        const speakBtn = document.createElement('button');
+        speakBtn.className   = 'speak-btn';
+        speakBtn.title       = '播放發音';
+        speakBtn.innerHTML   = '🔊';
+        speakBtn.onclick     = () => speak(q.answer);
+        const hintDiv = document.getElementById('sentence-hint');
+        hintDiv.innerHTML = '';
+        hintDiv.appendChild(speakBtn);
+        // 中文提示（從 question_text 來）
+        const hintText = document.createElement('div');
+        hintText.style.marginTop = '6px';
+        hintText.innerText = q.question_text;
+        hintDiv.appendChild(hintText);
         showInput();
     }
     else {
@@ -531,8 +601,72 @@ function loadGrammarQuestion() {
     document.getElementById('question-type-text').innerText = '選出正確的動詞形式';
     document.getElementById('sentence-hint').innerHTML =
         q.question_text.replace('___', '<span class="highlight">___</span>');
-
     const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options);
+    renderOptions(opts, q.answer, true);
+}
+
+// ── Matching：看圖選字 ───────────────────────────────
+function loadMatchingQuestion() {
+    const q    = currentPool[0];
+    const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options);
+
+    if (q.type === 'match_img2word') {
+        setTypeBadge('Matching — 看圖選字', 'badge-choice');
+        document.getElementById('question-type-text').innerText = q.question_text;
+        if (q.image_path) {
+            document.getElementById('main-image').src           = q.image_path;
+            document.getElementById('main-image').style.display = 'block';
+        }
+        renderOptions(opts, q.answer);
+    } else {
+        // match_word2img：出文字，選圖片
+        setTypeBadge('Matching — 看字選圖', 'badge-choice');
+        document.getElementById('question-type-text').innerText = q.question_text;
+        renderImgOptions(opts, q.answer);
+    }
+}
+
+// ── Spelling：純拼字 ────────────────────────────────
+function loadSpellingQuestion() {
+    const q = currentPool[0];
+    setTypeBadge('Spelling', 'badge-spelling');
+    document.getElementById('question-type-text').innerText = '';
+
+    const hintDiv = document.getElementById('sentence-hint');
+    hintDiv.innerHTML = '';
+
+    // 喇叭按鈕
+    const speakBtn    = document.createElement('button');
+    speakBtn.className = 'speak-btn';
+    speakBtn.title     = '播放發音';
+    speakBtn.innerHTML = '🔊';
+    speakBtn.onclick   = () => speak(q.answer);
+    hintDiv.appendChild(speakBtn);
+
+    // 中文提示
+    const hint = document.createElement('div');
+    hint.style.marginTop  = '8px';
+    hint.style.fontSize   = '16px';
+    hint.style.color      = '#555';
+    hint.innerText = q.question_text;
+    hintDiv.appendChild(hint);
+
+    // 顯示圖片（如果有）
+    if (q.image_path) {
+        document.getElementById('main-image').src           = q.image_path;
+        document.getElementById('main-image').style.display = 'block';
+    }
+    showInput();
+}
+
+// ── Phonics：發音題 ─────────────────────────────────
+function loadPhonicsQuestion() {
+    const q    = currentPool[0];
+    const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options);
+    setTypeBadge('發音題', 'badge-phonics');
+    document.getElementById('question-type-text').innerText = '';
+    document.getElementById('sentence-hint').innerHTML =
+        `<span style="font-size:18px;font-weight:700;color:#333;">${q.question_text}</span>`;
     renderOptions(opts, q.answer, true);
 }
 
@@ -565,6 +699,28 @@ function renderOptions(opts, answer, singleCol) {
             btn.style.backgroundColor = '#ddf4ff';
             btn.style.borderColor     = '#1cb0f6';
             selectedOption = opt;
+            document.getElementById('submit-btn').disabled = false;
+        };
+        div.appendChild(btn);
+    });
+}
+
+// 看字選圖：圖片選項
+function renderImgOptions(opts, answer) {
+    const div = document.getElementById('options');
+    div.className = 'img-options-grid';
+    div.innerHTML = '';
+    [...opts].sort(() => 0.5 - Math.random()).forEach(imgPath => {
+        const btn = document.createElement('button');
+        btn.className = 'img-opt-btn';
+        const img  = document.createElement('img');
+        img.src    = imgPath;
+        img.alt    = '';
+        btn.appendChild(img);
+        btn.onclick = () => {
+            document.querySelectorAll('.img-opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedOption = imgPath;
             document.getElementById('submit-btn').disabled = false;
         };
         div.appendChild(btn);
@@ -607,6 +763,30 @@ document.getElementById('submit-btn').onclick = async function() {
             else if (b.innerText === selectedOption)                  b.classList.add('wrong');
         });
     }
+    else if (q.type === 'match_img2word' || q.type === 'phonics') {
+        isCorrect      = userAns === q.answer.toLowerCase();
+        correctDisplay = q.answer;
+        document.querySelectorAll('.opt').forEach(b => {
+            if (b.innerText.toLowerCase() === q.answer.toLowerCase()) b.classList.add('correct');
+            else if (b.innerText === selectedOption)                  b.classList.add('wrong');
+        });
+    }
+    else if (q.type === 'match_word2img') {
+        const normalize = p => (p || '').split('/').pop();
+        isCorrect      = normalize(selectedOption) === normalize(q.answer);
+        correctDisplay = q.noun || q.answer;
+        document.querySelectorAll('.img-opt-btn').forEach(b => {
+            const src = b.querySelector('img') ? b.querySelector('img').src : '';
+            if (normalize(src) === normalize(q.answer))  b.classList.add('correct');
+            else if (b.classList.contains('selected'))   b.classList.add('wrong');
+            b.disabled = true;
+        });
+    }
+    else if (q.type === 'spelling') {
+        const normalize = s => s.toLowerCase().replace('é','e').trim();
+        isCorrect      = normalize(userAns) === normalize(q.answer);
+        correctDisplay = q.answer;
+    }
     else if (questionMode === 'choice') {
         isCorrect      = userAns === q.answer.toLowerCase();
         correctDisplay = q.answer;
@@ -616,7 +796,8 @@ document.getElementById('submit-btn').onclick = async function() {
         });
     }
     else if (questionMode === 'spelling') {
-        isCorrect      = userAns === q.noun.toLowerCase();
+        const normalize = s => s.toLowerCase().replace('é','e').trim();
+        isCorrect      = normalize(userAns) === normalize(q.noun);
         correctDisplay = q.noun;
     }
     else {
@@ -625,7 +806,9 @@ document.getElementById('submit-btn').onclick = async function() {
         correctDisplay = target;
     }
 
-    saveRecord(currentStudent.id, q.id, appMode, isCorrect);
+    // 儲存記錄（mode 統一存 'vocab' 或 'grammar'）
+    const recordMode = (appMode === 'U6' || appMode === 'U7') ? 'vocab' : 'grammar';
+    saveRecord(currentStudent.id, q.id, recordMode, isCorrect);
 
     const fb = document.getElementById('feedback');
     if (isCorrect) {
