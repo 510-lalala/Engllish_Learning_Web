@@ -99,7 +99,7 @@
         .wrong   { background: #ffdfe0 !important; border-color: #ff4b4b !important; color: #cc0000; }
 
         #input-zone { display: none; margin-top: 10px; }
-        #user-input { width: 100%; padding: 12px; font-size: 20px; border-radius: 10px; border: 2px solid #ddd; text-align: center; }
+        #user-input { width: 85%; padding: 12px; font-size: 20px; border-radius: 10px; border: 2px solid #ddd; text-align: center; }
         #user-input:focus { outline: none; border-color: #1cb0f6; }
 
         #submit-btn { padding: 15px; font-size: 18px; font-weight: bold; border-radius: 12px; cursor: pointer; width: 100%; margin-top: 16px; background-color: #1cb0f6; color: white; border: none; }
@@ -128,6 +128,28 @@
 
         /* ── 錯誤訊息 ── */
         .error-box { background: #ffdfe0; border: 1px solid #ff4b4b; color: #cc0000; padding: 12px 16px; border-radius: 10px; font-size: 14px; margin-top: 10px; display: none; }
+
+        /* ── 歷史紀錄頁 ── */
+        #history-screen { background: white; padding: 24px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: none; }
+        .history-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .history-header h2 { font-size: 20px; font-weight: 700; color: #333; }
+        .session-card { border: 1px solid #e5e5e5; border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; cursor: default; }
+        .session-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .session-mode-tag { font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 20px; background: #f0f4ff; color: #4a6cf7; }
+        .session-date { font-size: 12px; color: #aaa; }
+        .session-stats { display: flex; gap: 16px; }
+        .session-stat { font-size: 14px; color: #555; }
+        .session-stat span { font-weight: 700; color: #333; }
+        .session-wrong-btn { font-size: 13px; color: #ff4b4b; background: #fff0f0; border: 1px solid #ffd0d0; border-radius: 8px; padding: 4px 10px; cursor: pointer; margin-top: 8px; }
+        .session-wrong-btn:hover { background: #ffdfe0; }
+        .wrong-list { margin-top: 10px; border-top: 1px solid #f0f0f0; padding-top: 10px; display: none; }
+        .wrong-list.open { display: block; }
+        .wrong-item { font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f5f5f5; }
+        .wrong-item:last-child { border-bottom: none; }
+        .wrong-item .q-text { color: #555; margin-bottom: 3px; }
+        .wrong-item .user-ans { color: #ff4b4b; }
+        .wrong-item .correct-ans { color: #58cc02; }
+        .no-history { text-align: center; color: #aaa; font-size: 15px; padding: 40px 0; }
     </style>
 </head>
 <body>
@@ -161,6 +183,7 @@
             <button class="mode-btn btn-u7vocab"  onclick="goSub('U7')">🚌<br>U7<br>單字</button>
             <button class="mode-btn btn-grammar"  onclick="goSub('grammar')">✏️<br>文法<br>練習</button>
         </div>
+        <button onclick="goHistory()" style="width:100%;margin-top:12px;padding:12px;background:white;border:2px solid #e5e5e5;border-radius:14px;font-size:15px;color:#888;cursor:pointer;">📋 我的紀錄</button>
     </div>
 
     <!-- ③ 子選單 -->
@@ -244,6 +267,18 @@
         </div>
     </div>
 
+    <!-- ⑤ 歷史紀錄 -->
+    <div id="history-screen">
+        <div class="history-header">
+            <button class="back-link" onclick="goHome()">← 返回</button>
+            <h2>📋 我的紀錄</h2>
+        </div>
+        <div id="history-list">
+            <div class="no-history">載入中...</div>
+        </div>
+    </div>
+
+
 </div>
 
 <script>
@@ -311,12 +346,66 @@ async function upsertStudent(name, className) {
     return inserted[0];
 }
 
-async function saveRecord(studentId, questionId, mode, isCorrect) {
+// 建立一輪的 session
+async function createSession(studentId, mode) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/sessions`, {
+        method:  'POST',
+        headers: { ...headers, 'Prefer': 'return=representation' },
+        body:    JSON.stringify({ student_id: studentId, mode, wrong_count: 0 })
+    }).catch(() => null);
+    if (!res || !res.ok) return null;
+    const data = await res.json();
+    return data[0]?.id || null;
+}
+
+// 完成時更新 session 的 wrong_count 和 duration
+async function finalizeSession(sessionId, wrongCount, durationSeconds) {
+    if (!sessionId) return;
+    await fetch(`${SUPABASE_URL}/rest/v1/sessions?id=eq.${sessionId}`, {
+        method:  'PATCH',
+        headers: { ...headers, 'Prefer': 'return=minimal' },
+        body:    JSON.stringify({ wrong_count: wrongCount, duration_seconds: durationSeconds })
+    }).catch(() => {});
+}
+
+async function saveRecord(studentId, questionId, mode, isCorrect, userAnswer, correctAnswer) {
+    if (!currentSessionId) return;
     await fetch(`${SUPABASE_URL}/rest/v1/records`, {
         method:  'POST',
         headers: { ...headers, 'Prefer': 'return=minimal' },
-        body:    JSON.stringify({ student_id: studentId, question_id: questionId, mode, is_correct: isCorrect })
+        body:    JSON.stringify({
+            student_id:    studentId,
+            question_id:   questionId,
+            session_id:    currentSessionId,
+            mode,
+            is_correct:    isCorrect,
+            user_answer:   userAnswer,
+            correct_answer: correctAnswer
+        })
     }).catch(() => {});
+}
+
+// 抓最近 10 筆 sessions（含答錯明細）
+async function fetchSessions(studentId) {
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    const iso = oneMonthAgo.toISOString();
+
+    const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/sessions?student_id=eq.${studentId}&completed_at=gte.${iso}&order=completed_at.desc&limit=10&select=*`,
+        { headers }
+    );
+    if (!res.ok) return [];
+    return await res.json();
+}
+
+async function fetchWrongRecords(sessionId) {
+    const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/records?session_id=eq.${sessionId}&is_correct=eq.false&select=user_answer,correct_answer,question_id,questions(question_text,answer)`,
+        { headers: { ...headers, 'Accept': 'application/json' } }
+    );
+    if (!res.ok) return [];
+    return await res.json();
 }
 
 // 完成一輪後，更新 students 表的 last & best 秒數
@@ -393,7 +482,9 @@ function formatTime(seconds) {
 // ═══════════════════════════════════════════════════
 let currentStudent = null;
 let appMode        = '';
-let u7SubMode      = '';   // 'matching' | 'spelling' | 'mix'
+let u7SubMode      = '';
+let currentSessionId = null;   // 目前這輪的 session id
+let wrongRecords     = [];      // 這輪答錯的記錄 [{question, userAns, correctAns}]   // 'matching' | 'spelling' | 'mix'
 let allQuestions   = [];
 let currentPool    = [];
 let totalRound     = 0;
@@ -403,13 +494,12 @@ let questionMode   = 'choice';
 
 const correctSound = new Audio('./sound/correct.mp3');
 const wrongSound   = new Audio('./sound/wrong.mp3');
-const winSound     = new Audio('./sound/win.mp3');
 
 // ═══════════════════════════════════════════════════
 // 畫面切換
 // ═══════════════════════════════════════════════════
 function showScreen(id) {
-    ['loading-screen','login-screen','home-screen','sub-screen','quiz-container']
+    ['loading-screen','login-screen','home-screen','sub-screen','quiz-container','history-screen']
         .forEach(s => document.getElementById(s).style.display = 'none');
     document.getElementById(id).style.display = 'block';
 }
@@ -516,7 +606,9 @@ async function startGame() {
 
     totalRound   = appMode === 'grammar' ? 10 : 8;
     currentPool  = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, totalRound);
-    correctCount = 0;
+    correctCount  = 0;
+    wrongRecords  = [];
+    currentSessionId = null;
 
     const subLabel = u7SubMode ? ` — ${u7SubMode.charAt(0).toUpperCase()+u7SubMode.slice(1)}` : '';
     const modeLabel = appMode === 'U6' ? '📖 U6 單字' : appMode === 'U7' ? `🚌 U7 單字${subLabel}` : '✏️ 文法練習';
@@ -527,6 +619,10 @@ async function startGame() {
     document.getElementById('retry-btn').onclick = startGame;
 
     showScreen('quiz-container');
+
+    // 建立這輪的 session
+    const modeKey = appMode === 'U7' ? `U7-${u7SubMode}` : appMode;
+    currentSessionId = await createSession(currentStudent.id, modeKey);
 
     // 開始計時
     startTimer();
@@ -574,11 +670,7 @@ function loadVocabQuestion() {
     const modes  = ['choice', 'spelling', 'sentence'];
     questionMode = modes[Math.floor(Math.random() * modes.length)];
 
-    let finalPath = q.image_path;
-if (finalPath && finalPath.startsWith('./')) {
-    finalPath = finalPath.substring(1); // 把 "." 去掉，變成 "/U7images/..."
-}
-document.getElementById('main-image').src = finalPath;
+    document.getElementById('main-image').src           = q.image_path;
     document.getElementById('main-image').style.display = 'block';
 
     const opts = Array.isArray(q.options) ? q.options : JSON.parse(q.options);
@@ -645,11 +737,7 @@ function loadMatchingQuestion() {
         setTypeBadge('Matching — 看圖選字', 'badge-choice');
         document.getElementById('question-type-text').innerText = q.question_text;
         if (q.image_path) {
-            let finalPath = q.image_path;
-if (finalPath && finalPath.startsWith('./')) {
-    finalPath = finalPath.substring(1); // 把 "." 去掉，變成 "/U7images/..."
-}
-document.getElementById('main-image').src = finalPath;
+            document.getElementById('main-image').src           = q.image_path;
             document.getElementById('main-image').style.display = 'block';
         }
         renderOptions(opts, q.answer);
@@ -688,11 +776,7 @@ function loadSpellingQuestion() {
 
     // 顯示圖片（如果有）
     if (q.image_path) {
-        let finalPath = q.image_path;
-if (finalPath && finalPath.startsWith('./')) {
-    finalPath = finalPath.substring(1); // 把 "." 去掉，變成 "/U7images/..."
-}
-document.getElementById('main-image').src = finalPath;
+        document.getElementById('main-image').src           = q.image_path;
         document.getElementById('main-image').style.display = 'block';
     }
     showInput();
@@ -845,9 +929,10 @@ document.getElementById('submit-btn').onclick = async function() {
         correctDisplay = target;
     }
 
-    // 儲存記錄（mode 統一存 'vocab' 或 'grammar'）
+    // 儲存記錄
     const recordMode = (appMode === 'U6' || appMode === 'U7') ? 'vocab' : 'grammar';
-    saveRecord(currentStudent.id, q.id, recordMode, isCorrect);
+    saveRecord(currentStudent.id, q.id, recordMode, isCorrect,
+        selectedOption || '', correctDisplay);
 
     const fb = document.getElementById('feedback');
     if (isCorrect) {
@@ -862,6 +947,16 @@ document.getElementById('submit-btn').onclick = async function() {
         wrongSound.play().catch(() => {});
         fb.innerText   = `不對喔，正確答案是: ${correctDisplay}`;
         fb.style.color = '#ff4b4b';
+        // 記錄答錯的題目（只記一次，避免重複）
+        const alreadyWrong = wrongRecords.some(w => w.questionId === q.id);
+        if (!alreadyWrong) {
+            wrongRecords.push({
+                questionId:  q.id,
+                questionText: q.question_text,
+                userAns:     selectedOption || '',
+                correctAns:  correctDisplay
+            });
+        }
         let failed = currentPool.shift();
         currentPool.push(failed);
         setTimeout(nextQ, 2500);
@@ -882,16 +977,18 @@ function updateProgress() {
 // ═══════════════════════════════════════════════════
 async function finishGame() {
     stopTimer();
-    const elapsed = timerSeconds;
-    winSound.play().catch(e => console.log("音效播放失敗:", e));
+    const elapsed   = timerSeconds;
+    const wrongCount = wrongRecords.length;
 
-    // 更新 Supabase students 表，取回是否刷新紀錄
+    // 完成 session 紀錄
+    await finalizeSession(currentSessionId, wrongCount, elapsed);
+
+    // 更新 students 表最快紀錄
     const { isNewRecord, bestSeconds } = await updateStudentTime(
         currentStudent.id, appMode, elapsed
     );
 
-    // 同步更新本地 currentStudent（讓再試一次能拿到最新 best）
-    const bestKey = appMode === 'vocab' ? 'best_vocab_seconds' : 'best_grammar_seconds';
+    const bestKey = (appMode === 'U6' || appMode === 'U7') ? 'best_vocab_seconds' : 'best_grammar_seconds';
     currentStudent[bestKey] = bestSeconds;
 
     showResult(elapsed, bestSeconds, isNewRecord);
@@ -921,6 +1018,82 @@ function showResult(elapsed, bestSeconds, isNewRecord) {
 
     document.getElementById('game-zone').style.display   = 'none';
     document.getElementById('result-zone').style.display = 'block';
+}
+
+// ═══════════════════════════════════════════════════
+// 歷史紀錄
+// ═══════════════════════════════════════════════════
+async function goHistory() {
+    showScreen('loading-screen');
+    const sessions = await fetchSessions(currentStudent.id);
+    showScreen('history-screen');
+    renderHistory(sessions);
+}
+
+function renderHistory(sessions) {
+    const list = document.getElementById('history-list');
+    if (!sessions.length) {
+        list.innerHTML = '<div class="no-history">最近一個月內沒有作答紀錄</div>';
+        return;
+    }
+    list.innerHTML = '';
+
+    const modeNames = {
+        'U6': '📖 U6 單字', 'U7-matching': '🎯 U7 Matching',
+        'U7-spelling': '🔤 U7 Spelling', 'U7-mix': '🎲 U7 Mix',
+        'grammar': '✏️ 文法'
+    };
+
+    sessions.forEach(s => {
+        const date = new Date(s.completed_at);
+        const dateStr = `${date.getMonth()+1}/${date.getDate()} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+        const modeName = modeNames[s.mode] || s.mode;
+        const timeStr  = s.duration_seconds != null ? formatTime(s.duration_seconds) : '—';
+
+        const card = document.createElement('div');
+        card.className = 'session-card';
+        card.innerHTML = `
+            <div class="session-card-top">
+                <span class="session-mode-tag">${modeName}</span>
+                <span class="session-date">${dateStr}</span>
+            </div>
+            <div class="session-stats">
+                <div class="session-stat">答錯 <span style="color:${s.wrong_count>0?'#ff4b4b':'#58cc02'}">${s.wrong_count} 題</span></div>
+                <div class="session-stat">用時 <span>${timeStr}</span></div>
+            </div>
+            ${s.wrong_count > 0 ? `<button class="session-wrong-btn" onclick="toggleWrongList(this, ${s.id})">查看答錯題目 ▼</button><div class="wrong-list" id="wl-${s.id}"><div style="color:#aaa;font-size:13px;">載入中...</div></div>` : ''}
+        `;
+        list.appendChild(card);
+    });
+}
+
+async function toggleWrongList(btn, sessionId) {
+    const wl = document.getElementById('wl-' + sessionId);
+    if (wl.classList.contains('open')) {
+        wl.classList.remove('open');
+        btn.innerText = '查看答錯題目 ▼';
+        return;
+    }
+    wl.classList.add('open');
+    btn.innerText = '收起 ▲';
+
+    // 如果還沒載入過
+    if (wl.dataset.loaded) return;
+    wl.dataset.loaded = '1';
+
+    const records = await fetchWrongRecords(sessionId);
+    if (!records.length) {
+        wl.innerHTML = '<div style="color:#aaa;font-size:13px;">無資料</div>';
+        return;
+    }
+    wl.innerHTML = records.map(r => {
+        const qText = r.questions?.question_text || `題目 #${r.question_id}`;
+        return `<div class="wrong-item">
+            <div class="q-text">📝 ${qText}</div>
+            <div class="user-ans">你的答案：${r.user_answer || '（未作答）'}</div>
+            <div class="correct-ans">正確答案：${r.correct_answer || r.questions?.answer || '—'}</div>
+        </div>`;
+    }).join('');
 }
 
 // ═══════════════════════════════════════════════════
