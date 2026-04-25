@@ -1127,7 +1127,7 @@ async function finishGame() {
     stopTimer();
     const elapsed    = timerSeconds;
     const wrongCount = wrongRecords.length;
-    if(isRetry)return;
+    //if(isRetry)return;
     // 完成 session 紀錄
     await finalizeSession(currentSessionId, wrongCount, elapsed);
 
@@ -1322,7 +1322,7 @@ async function startRetryWrong(questionIds, sessionMode) {
         showScreen('history-screen');
         return;
     }
-    isRetry=True;
+    
     // 設定好模式，直接用這批題目開始
     // 從 sessionMode 解析 appMode / u7SubMode
     if (sessionMode === 'grammar') {
