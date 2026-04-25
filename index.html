@@ -514,7 +514,7 @@ async function startGame() {
         return;
     }
 
-    totalRound   = appMode === 'grammar' ? 10 : 16;
+    totalRound   = appMode === 'grammar' ? 10 : 8;
     currentPool  = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, totalRound);
     correctCount = 0;
 
