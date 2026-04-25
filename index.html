@@ -1127,6 +1127,7 @@ async function finishGame() {
     stopTimer();
     const elapsed    = timerSeconds;
     const wrongCount = wrongRecords.length;
+    if(isRetryMode)return;
 
     // 完成 session 紀錄
     await finalizeSession(currentSessionId, wrongCount, elapsed);
@@ -1304,6 +1305,7 @@ async function startRetryWrong(questionIds, sessionMode) {
     if (!questionIds.length) return;
     showScreen('loading-screen');
 
+    isRetryMode = true;
     // 撈這些題目的完整資料
     const ids = questionIds.join(',');
     const res = await fetch(
@@ -1350,7 +1352,7 @@ async function startRetryWrong(questionIds, sessionMode) {
     document.getElementById('quiz-back-btn').onclick = () => { stopTimer(); goHistory(); };
 
     showScreen('quiz-container');
-    startTimer();
+    //startTimer();
     loadQuestion();
 }
 
