@@ -150,6 +150,40 @@
         .wrong-item .user-ans { color: #ff4b4b; }
         .wrong-item .correct-ans { color: #58cc02; }
         .no-history { text-align: center; color: #aaa; font-size: 15px; padding: 40px 0; }
+        .tag-incomplete { display: inline-block; font-size: 11px; font-weight: 700; background: #fff3e0; color: #e67e00; border: 1px solid #ffd0a0; border-radius: 20px; padding: 2px 8px; margin-left: 6px; vertical-align: middle; }
+        .retry-wrong-btn { display: block; width: 100%; margin-top: 12px; padding: 10px; background: #4a6cf7; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+        .retry-wrong-btn:hover { opacity: 0.88; }
+
+        /* ── XP 與排行榜 ── */
+        .xp-gained-box { background: linear-gradient(135deg, #ffecd2, #fcb69f); border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; text-align: center; }
+        .xp-gained-title { font-size: 13px; color: #8b3a00; margin-bottom: 6px; font-weight: 600; }
+        .xp-gained-rows { display: flex; flex-direction: column; gap: 4px; }
+        .xp-row { font-size: 14px; color: #8b3a00; }
+        .xp-row .xp-num { font-weight: 700; color: #e65000; }
+        .xp-total-row { font-size: 18px; font-weight: 700; color: #e65000; margin-top: 6px; border-top: 1px solid #f9b88a; padding-top: 6px; }
+
+        /* 排行榜區塊（結果頁內嵌 & 獨立頁） */
+        .lb-wrap { margin-top: 16px; }
+        .lb-tabs { display: flex; gap: 0; margin-bottom: 0; border-radius: 12px 12px 0 0; overflow: hidden; border: 1.5px solid #e5e5e5; border-bottom: none; }
+        .lb-tab  { flex: 1; padding: 10px; font-size: 14px; font-weight: 700; cursor: pointer; background: #f5f5f5; color: #aaa; border: none; transition: 0.15s; }
+        .lb-tab.active { background: white; color: #4a6cf7; }
+        .lb-table-wrap { border: 1.5px solid #e5e5e5; border-radius: 0 0 12px 12px; background: white; overflow: hidden; }
+        .lb-row { display: flex; align-items: center; padding: 10px 14px; border-bottom: 1px solid #f0f0f0; gap: 10px; }
+        .lb-row:last-child { border-bottom: none; }
+        .lb-row.me { background: #f0f4ff; }
+        .lb-rank { font-size: 16px; font-weight: 700; width: 28px; text-align: center; flex-shrink: 0; }
+        .lb-rank.gold   { color: #f5a623; }
+        .lb-rank.silver { color: #9b9b9b; }
+        .lb-rank.bronze { color: #c47d2b; }
+        .lb-name  { flex: 1; font-size: 14px; color: #333; font-weight: 600; }
+        .lb-class { font-size: 12px; color: #aaa; margin-left: 4px; font-weight: 400; }
+        .lb-xp    { font-size: 15px; font-weight: 700; color: #4a6cf7; }
+        .lb-empty { text-align: center; color: #aaa; font-size: 14px; padding: 20px; }
+
+        /* 獨立排行榜頁 */
+        #leaderboard-screen { background: white; padding: 24px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: none; }
+        .lb-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .lb-header h2 { font-size: 20px; font-weight: 700; color: #333; }
     </style>
 </head>
 <body>
@@ -183,7 +217,10 @@
             <button class="mode-btn btn-u7vocab"  onclick="goSub('U7')">🚌<br>U7<br>單字</button>
             <button class="mode-btn btn-grammar"  onclick="goSub('grammar')">✏️<br>文法<br>練習</button>
         </div>
-        <button onclick="goHistory()" style="width:100%;margin-top:12px;padding:12px;background:white;border:2px solid #e5e5e5;border-radius:14px;font-size:15px;color:#888;cursor:pointer;">📋 我的紀錄</button>
+        <div style="display:flex;gap:10px;margin-top:12px;">
+            <button onclick="goHistory()" style="flex:1;padding:12px;background:white;border:2px solid #e5e5e5;border-radius:14px;font-size:15px;color:#888;cursor:pointer;">📋 我的紀錄</button>
+            <button onclick="goLeaderboard()" style="flex:1;padding:12px;background:white;border:2px solid #e5e5e5;border-radius:14px;font-size:15px;color:#888;cursor:pointer;">🏆 排行榜</button>
+        </div>
     </div>
 
     <!-- ③ 子選單 -->
@@ -260,9 +297,43 @@
                 </div>
             </div>
 
+
+            <!-- XP 獲得明細 -->
+            <div class="xp-gained-box" id="xp-gained-box" style="display:none">
+                <div class="xp-gained-title">✨ 本輪獲得經驗值</div>
+                <div class="xp-gained-rows" id="xp-gained-rows"></div>
+            </div>
+
+            <!-- 結果頁排行榜 -->
+            <div class="lb-wrap" id="result-lb-wrap" style="display:none">
+                <div style="font-size:15px;font-weight:700;color:#333;margin-bottom:10px;">🏆 排行榜</div>
+                <div class="lb-tabs">
+                    <button class="lb-tab active" id="res-lb-tab-all"   onclick="switchResLbTab('all')">全班</button>
+                    <button class="lb-tab"        id="res-lb-tab-class" onclick="switchResLbTab('class')">同班</button>
+                </div>
+                <div class="lb-table-wrap" id="res-lb-table"></div>
+            </div>
+
             <div class="result-btns">
                 <button class="btn-start"  id="retry-btn">再試一次</button>
                 <button class="btn-return" onclick="goHome()">回首頁</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⑥ 排行榜 -->
+    <div id="leaderboard-screen">
+        <div class="lb-header">
+            <button class="back-link" onclick="goHome()">← 返回</button>
+            <h2>🏆 排行榜</h2>
+        </div>
+        <div class="lb-wrap">
+            <div class="lb-tabs">
+                <button class="lb-tab active" id="lb-tab-all"   onclick="switchLbTab('all')">全班排名</button>
+                <button class="lb-tab"        id="lb-tab-class" onclick="switchLbTab('class')">同班排名</button>
+            </div>
+            <div class="lb-table-wrap" id="lb-table-wrap">
+                <div class="lb-empty">載入中...</div>
             </div>
         </div>
     </div>
@@ -439,6 +510,77 @@ async function updateStudentTime(studentId, mode, seconds) {
     return { isNewRecord, bestSeconds: newBest };
 }
 
+// ── XP API ──────────────────────────────────────────
+
+// 給學生加 XP 並記錄 log
+async function addXP(studentId, xpGained, reason, sessionId) {
+    // 先取得目前 XP
+    const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/students?id=eq.${studentId}&select=xp`,
+        { headers }
+    ).catch(() => null);
+    if (!res || !res.ok) return;
+    const data = await res.json();
+    const currentXp = data[0]?.xp || 0;
+
+    // 更新 XP
+    await fetch(`${SUPABASE_URL}/rest/v1/students?id=eq.${studentId}`, {
+        method:  'PATCH',
+        headers: { ...headers, 'Prefer': 'return=minimal' },
+        body:    JSON.stringify({ xp: currentXp + xpGained })
+    }).catch(() => {});
+
+    // 記錄 log
+    await fetch(`${SUPABASE_URL}/rest/v1/xp_logs`, {
+        method:  'POST',
+        headers: { ...headers, 'Prefer': 'return=minimal' },
+        body:    JSON.stringify({ student_id: studentId, xp_gained: xpGained, reason, session_id: sessionId || null })
+    }).catch(() => {});
+
+    // 更新本地 currentStudent
+    if (currentStudent) currentStudent.xp = currentXp + xpGained;
+}
+
+// 抓全班前10名
+async function fetchLeaderboardAll() {
+    const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/students?select=id,name,class_name,xp&order=xp.desc&limit=10`,
+        { headers }
+    ).catch(() => null);
+    if (!res || !res.ok) return [];
+    return await res.json();
+}
+
+// 抓同班前10名
+async function fetchLeaderboardClass(className) {
+    const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/students?class_name=eq.${encodeURIComponent(className)}&select=id,name,class_name,xp&order=xp.desc&limit=10`,
+        { headers }
+    ).catch(() => null);
+    if (!res || !res.ok) return [];
+    return await res.json();
+}
+
+// 渲染排行榜列表
+function renderLbRows(rows, containerId) {
+    const wrap = document.getElementById(containerId);
+    if (!rows.length) { wrap.innerHTML = '<div class="lb-empty">暫無資料</div>'; return; }
+    const medals = ['🥇','🥈','🥉'];
+    const rankClass = ['gold','silver','bronze'];
+    wrap.innerHTML = rows.map((r, i) => {
+        const isMe = currentStudent && r.id === currentStudent.id;
+        const rank = i < 3
+            ? `<span class="lb-rank ${rankClass[i]}">${medals[i]}</span>`
+            : `<span class="lb-rank">${i+1}</span>`;
+        return `<div class="lb-row${isMe?' me':''}">
+            ${rank}
+            <span class="lb-name">${r.name}<span class="lb-class">${r.class_name||''}</span></span>
+            <span class="lb-xp">${r.xp||0} XP</span>
+        </div>`;
+    }).join('');
+}
+
+
 // ═══════════════════════════════════════════════════
 // 計時器
 // ═══════════════════════════════════════════════════
@@ -484,7 +626,10 @@ let currentStudent = null;
 let appMode        = '';
 let u7SubMode      = '';
 let currentSessionId = null;   // 目前這輪的 session id
-let wrongRecords     = [];      // 這輪答錯的記錄 [{question, userAns, correctAns}]   // 'matching' | 'spelling' | 'mix'
+let wrongRecords     = [];      // 這輪答錯的記錄
+let xpThisRound      = 0;       // 這輪累積的 XP
+let lbCurrentTab     = 'all';   // 排行榜目前頁籤
+let resLbCurrentTab  = 'all';   // 結果頁排行榜頁籤   // 'matching' | 'spelling' | 'mix'
 let allQuestions   = [];
 let currentPool    = [];
 let totalRound     = 0;
@@ -499,7 +644,7 @@ const wrongSound   = new Audio('./sound/wrong.mp3');
 // 畫面切換
 // ═══════════════════════════════════════════════════
 function showScreen(id) {
-    ['loading-screen','login-screen','home-screen','sub-screen','quiz-container','history-screen']
+    ['loading-screen','login-screen','home-screen','sub-screen','quiz-container','history-screen','leaderboard-screen']
         .forEach(s => document.getElementById(s).style.display = 'none');
     document.getElementById(id).style.display = 'block';
 }
@@ -609,6 +754,7 @@ async function startGame() {
     correctCount  = 0;
     wrongRecords  = [];
     currentSessionId = null;
+    xpThisRound   = 0;
 
     const subLabel = u7SubMode ? ` — ${u7SubMode.charAt(0).toUpperCase()+u7SubMode.slice(1)}` : '';
     const modeLabel = appMode === 'U6' ? '📖 U6 單字' : appMode === 'U7' ? `🚌 U7 單字${subLabel}` : '✏️ 文法練習';
@@ -941,6 +1087,8 @@ document.getElementById('submit-btn').onclick = async function() {
         fb.style.color = '#58cc02';
         currentPool.shift();
         correctCount++;
+        xpThisRound += 10;
+        addXP(currentStudent.id, 10, 'correct_answer', currentSessionId);
         updateProgress();
         setTimeout(nextQ, 1500);
     } else {
@@ -977,19 +1125,28 @@ function updateProgress() {
 // ═══════════════════════════════════════════════════
 async function finishGame() {
     stopTimer();
-    const elapsed   = timerSeconds;
+    const elapsed    = timerSeconds;
     const wrongCount = wrongRecords.length;
 
     // 完成 session 紀錄
     await finalizeSession(currentSessionId, wrongCount, elapsed);
 
-    // 更新 students 表最快紀錄
+    // 完成獎勵 +10 XP
+    xpThisRound += 10;
+    await addXP(currentStudent.id, 10, 'round_complete', currentSessionId);
+
+    // 更新最快紀錄
     const { isNewRecord, bestSeconds } = await updateStudentTime(
         currentStudent.id, appMode, elapsed
     );
-
     const bestKey = (appMode === 'U6' || appMode === 'U7') ? 'best_vocab_seconds' : 'best_grammar_seconds';
     currentStudent[bestKey] = bestSeconds;
+
+    // 刷新紀錄獎勵 +20 XP
+    if (isNewRecord) {
+        xpThisRound += 20;
+        await addXP(currentStudent.id, 20, 'new_record', currentSessionId);
+    }
 
     showResult(elapsed, bestSeconds, isNewRecord);
 }
@@ -997,7 +1154,7 @@ async function finishGame() {
 // ═══════════════════════════════════════════════════
 // 結果頁
 // ═══════════════════════════════════════════════════
-function showResult(elapsed, bestSeconds, isNewRecord) {
+async function showResult(elapsed, bestSeconds, isNewRecord) {
     const pct = Math.round(correctCount / totalRound * 100);
     let emoji = '🎉', msg = '';
     if      (pct === 100) { emoji = '🏆'; msg = '完美！全部答對，太厲害了！'; }
@@ -1005,19 +1162,50 @@ function showResult(elapsed, bestSeconds, isNewRecord) {
     else if (pct >= 60)   { emoji = '👍'; msg = '不錯喔！再多練習幾次！'; }
     else                  { emoji = '💪'; msg = '繼續努力，每次都有進步！'; }
 
-    document.getElementById('result-emoji').innerText   = emoji;
-    document.getElementById('result-score').innerText   = correctCount + ' / ' + totalRound;
-    document.getElementById('result-msg').innerText     = msg;
-    document.getElementById('result-time').innerText    = formatTime(elapsed);
+    document.getElementById('result-emoji').innerText     = emoji;
+    document.getElementById('result-score').innerText     = correctCount + ' / ' + totalRound;
+    document.getElementById('result-msg').innerText       = msg;
+    document.getElementById('result-time').innerText      = formatTime(elapsed);
     document.getElementById('result-best-time').innerText = formatTime(bestSeconds);
-    document.getElementById('progress-fill').style.width = '100%';
+    document.getElementById('progress-fill').style.width  = '100%';
 
     // 刷新紀錄橫幅
     const banner = document.getElementById('new-record-banner');
     banner.className = 'new-record-banner' + (isNewRecord ? ' show' : '');
 
+    // XP 明細
+    const xpBox  = document.getElementById('xp-gained-box');
+    const xpRows = document.getElementById('xp-gained-rows');
+    const correctXp = (correctCount * 10);
+    let xpLines = `<div class="xp-row">答對 ${correctCount} 題：<span class="xp-num">+${correctXp} XP</span></div>`;
+    xpLines += `<div class="xp-row">完成一輪：<span class="xp-num">+10 XP</span></div>`;
+    if (isNewRecord) xpLines += `<div class="xp-row">🏅 刷新紀錄：<span class="xp-num">+20 XP</span></div>`;
+    xpLines += `<div class="xp-total-row">本輪共獲得 ${xpThisRound} XP　累計 ${currentStudent.xp || 0} XP</div>`;
+    xpRows.innerHTML = xpLines;
+    xpBox.style.display = 'block';
+
     document.getElementById('game-zone').style.display   = 'none';
     document.getElementById('result-zone').style.display = 'block';
+
+    // 載入排行榜
+    const lbWrap = document.getElementById('result-lb-wrap');
+    lbWrap.style.display = 'block';
+    resLbCurrentTab = 'all';
+    document.getElementById('res-lb-tab-all').classList.add('active');
+    document.getElementById('res-lb-tab-class').classList.remove('active');
+    const allRows = await fetchLeaderboardAll();
+    renderLbRows(allRows, 'res-lb-table');
+}
+
+async function switchResLbTab(tab) {
+    resLbCurrentTab = tab;
+    document.getElementById('res-lb-tab-all').classList.toggle('active', tab === 'all');
+    document.getElementById('res-lb-tab-class').classList.toggle('active', tab === 'class');
+    document.getElementById('res-lb-table').innerHTML = '<div class="lb-empty">載入中...</div>';
+    const rows = tab === 'all'
+        ? await fetchLeaderboardAll()
+        : await fetchLeaderboardClass(currentStudent.class_name);
+    renderLbRows(rows, 'res-lb-table');
 }
 
 // ═══════════════════════════════════════════════════
@@ -1047,27 +1235,30 @@ function renderHistory(sessions) {
     sessions.forEach(s => {
         const date = new Date(s.completed_at);
         const dateStr = `${date.getMonth()+1}/${date.getDate()} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
-        const modeName = modeNames[s.mode] || s.mode;
-        const timeStr  = s.duration_seconds != null ? formatTime(s.duration_seconds) : '—';
+        const modeName  = modeNames[s.mode] || s.mode;
+        const isComplete = s.duration_seconds != null;
+        const timeStr   = isComplete ? formatTime(s.duration_seconds) : '—';
+        const incompTag = !isComplete ? '<span class="tag-incomplete">未完成</span>' : '';
 
         const card = document.createElement('div');
         card.className = 'session-card';
+        card.style.borderLeft = isComplete ? '4px solid #58cc02' : '4px solid #e67e00';
         card.innerHTML = `
             <div class="session-card-top">
-                <span class="session-mode-tag">${modeName}</span>
+                <span class="session-mode-tag">${modeName}${incompTag}</span>
                 <span class="session-date">${dateStr}</span>
             </div>
             <div class="session-stats">
                 <div class="session-stat">答錯 <span style="color:${s.wrong_count>0?'#ff4b4b':'#58cc02'}">${s.wrong_count} 題</span></div>
                 <div class="session-stat">用時 <span>${timeStr}</span></div>
             </div>
-            ${s.wrong_count > 0 ? `<button class="session-wrong-btn" onclick="toggleWrongList(this, ${s.id})">查看答錯題目 ▼</button><div class="wrong-list" id="wl-${s.id}"><div style="color:#aaa;font-size:13px;">載入中...</div></div>` : ''}
+            ${s.wrong_count > 0 ? `<button class="session-wrong-btn" onclick="toggleWrongList(this, ${s.id}, '${s.mode}')">查看答錯題目 ▼</button><div class="wrong-list" id="wl-${s.id}"></div>` : ''}
         `;
         list.appendChild(card);
     });
 }
 
-async function toggleWrongList(btn, sessionId) {
+async function toggleWrongList(btn, sessionId, sessionMode) {
     const wl = document.getElementById('wl-' + sessionId);
     if (wl.classList.contains('open')) {
         wl.classList.remove('open');
@@ -1077,15 +1268,20 @@ async function toggleWrongList(btn, sessionId) {
     wl.classList.add('open');
     btn.innerText = '收起 ▲';
 
-    // 如果還沒載入過
+    // 如果已載入過，直接顯示
     if (wl.dataset.loaded) return;
     wl.dataset.loaded = '1';
+    wl.innerHTML = '<div style="color:#aaa;font-size:13px;padding:8px 0;">載入中...</div>';
 
     const records = await fetchWrongRecords(sessionId);
     if (!records.length) {
         wl.innerHTML = '<div style="color:#aaa;font-size:13px;">無資料</div>';
         return;
     }
+
+    // 收集答錯的 question_id 供再次作答用
+    const wrongIds = records.map(r => r.question_id).filter(Boolean);
+
     wl.innerHTML = records.map(r => {
         const qText = r.questions?.question_text || `題目 #${r.question_id}`;
         return `<div class="wrong-item">
@@ -1094,6 +1290,93 @@ async function toggleWrongList(btn, sessionId) {
             <div class="correct-ans">正確答案：${r.correct_answer || r.questions?.answer || '—'}</div>
         </div>`;
     }).join('');
+
+    // 「再次作答」按鈕
+    const retryBtn = document.createElement('button');
+    retryBtn.className = 'retry-wrong-btn';
+    retryBtn.innerText = '🔁 再次作答這些錯題';
+    retryBtn.onclick   = () => startRetryWrong(wrongIds, sessionMode);
+    wl.appendChild(retryBtn);
+}
+
+// 用答錯的 question_id 直接撈題目重新練習
+async function startRetryWrong(questionIds, sessionMode) {
+    if (!questionIds.length) return;
+    showScreen('loading-screen');
+
+    // 撈這些題目的完整資料
+    const ids = questionIds.join(',');
+    const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/questions?id=in.(${ids})&select=*`,
+        { headers }
+    ).catch(() => null);
+
+    if (!res || !res.ok) {
+        alert('題目載入失敗');
+        showScreen('history-screen');
+        return;
+    }
+    const questions = await res.json();
+    if (!questions.length) {
+        alert('找不到題目');
+        showScreen('history-screen');
+        return;
+    }
+
+    // 設定好模式，直接用這批題目開始
+    // 從 sessionMode 解析 appMode / u7SubMode
+    if (sessionMode === 'grammar') {
+        appMode = 'grammar'; u7SubMode = '';
+    } else if (sessionMode.startsWith('U7-')) {
+        appMode = 'U7'; u7SubMode = sessionMode.replace('U7-', '');
+    } else {
+        appMode = sessionMode; u7SubMode = '';
+    }
+
+    totalRound   = questions.length;
+    currentPool  = [...questions].sort(() => 0.5 - Math.random());
+    correctCount = 0;
+    wrongRecords = [];
+    currentSessionId = await createSession(currentStudent.id, sessionMode + '-retry');
+
+    const modeLabel = appMode === 'U6' ? '📖 U6 錯題練習'
+                    : appMode === 'U7' ? `🚌 U7 錯題練習`
+                    : '✏️ 文法錯題練習';
+    document.getElementById('quiz-mode-label').innerText = modeLabel;
+    document.getElementById('progress-fill').style.width = '0%';
+    document.getElementById('game-zone').style.display   = 'block';
+    document.getElementById('result-zone').style.display = 'none';
+    document.getElementById('retry-btn').onclick = () => startRetryWrong(questionIds, sessionMode);
+    document.getElementById('quiz-back-btn').onclick = () => { stopTimer(); goHistory(); };
+
+    showScreen('quiz-container');
+    startTimer();
+    loadQuestion();
+}
+
+// ═══════════════════════════════════════════════════
+// 排行榜頁
+// ═══════════════════════════════════════════════════
+async function goLeaderboard() {
+    showScreen('loading-screen');
+    lbCurrentTab = 'all';
+    showScreen('leaderboard-screen');
+    document.getElementById('lb-tab-all').classList.add('active');
+    document.getElementById('lb-tab-class').classList.remove('active');
+    document.getElementById('lb-table-wrap').innerHTML = '<div class="lb-empty">載入中...</div>';
+    const rows = await fetchLeaderboardAll();
+    renderLbRows(rows, 'lb-table-wrap');
+}
+
+async function switchLbTab(tab) {
+    lbCurrentTab = tab;
+    document.getElementById('lb-tab-all').classList.toggle('active', tab === 'all');
+    document.getElementById('lb-tab-class').classList.toggle('active', tab === 'class');
+    document.getElementById('lb-table-wrap').innerHTML = '<div class="lb-empty">載入中...</div>';
+    const rows = tab === 'all'
+        ? await fetchLeaderboardAll()
+        : await fetchLeaderboardClass(currentStudent.class_name);
+    renderLbRows(rows, 'lb-table-wrap');
 }
 
 // ═══════════════════════════════════════════════════
