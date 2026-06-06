@@ -1126,7 +1126,7 @@ document.getElementById('submit-btn').onclick = async function() {
         isCorrect      = normalize(userAns) === normalize(q.answer);
         correctDisplay = q.answer;
     }
-    else if (questionMode === 'choice') {
+    else if (questionMode === 'choice' || q.type === 'u8_choice') {
         isCorrect      = userAns === q.answer.toLowerCase();
         correctDisplay = q.answer;
         document.querySelectorAll('.opt').forEach(b => {
