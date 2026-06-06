@@ -367,38 +367,9 @@ const headers = {
     'Authorization': 'Bearer ' + SUPABASE_KEY
 };
 
-// Unit 8 題目直接放在前端，開啟網站後即可練習。
-const U8_QUESTIONS = [
-    { id: -801, type: 'u8_spelling', question_text: '看一些動物', answer: 'see some animals' },
-    { id: -802, type: 'u8_spelling', question_text: '騎馬', answer: 'ride a horse' },
-    { id: -803, type: 'u8_spelling', question_text: '探索洞穴', answer: 'explore a cave' },
-    { id: -804, type: 'u8_spelling', question_text: '生營火', answer: 'make a campfire' },
-    { id: -805, type: 'u8_spelling', question_text: '睡在帳篷裡', answer: 'sleep in a tent' },
-    { id: -806, type: 'u8_spelling', question_text: '餵海豚', answer: 'feed a dolphin' },
-    { id: -807, type: 'u8_spelling', question_text: '烤棉花糖', answer: 'roast marshmallows' },
-    { id: -808, type: 'u8_spelling', question_text: '待在家', answer: 'stay at home' },
-    { id: -809, type: 'u8_choice', question_text: 'What did she do?', answer: 'She roasted marshmallows.', options: ['She roasted marshmallows.', 'She roast marshmallows.', 'She roasts marshmallows.', 'She is roasting marshmallows.'] },
-    { id: -810, type: 'u8_choice', question_text: 'What did he do?', answer: 'He slept in a tent.', options: ['He sleep in a tent.', 'He slept in a tent.', 'He sleeps in a tent.', 'He sleeping in a tent.'] },
-    { id: -811, type: 'u8_choice', question_text: 'What did they do?', answer: 'They stayed at home.', options: ['They stay at home.', 'They stayed at home.', 'They stays at home.', 'They are stay at home.'] },
-    { id: -812, type: 'u8_choice', question_text: 'What did Brian do on the beach?', answer: 'He rode a horse.', options: ['He ride a horse.', 'He rode a horse.', 'He rides a horse.', 'He made a horse.'] },
-    { id: -813, type: 'u8_choice', question_text: 'What did Alex and Brian do?', answer: 'They explored a cave.', options: ['They explore a cave.', 'They explored a cave.', 'They saw a cave.', 'They slept a cave.'] },
-    { id: -814, type: 'u8_choice', question_text: 'What did Emma do?', answer: 'She saw a dolphin and a whale.', options: ['She see a dolphin and a whale.', 'She saw a dolphin and a whale.', 'She fed a cave.', 'She rode a dolphin and a whale.'] },
-    { id: -815, type: 'u8_choice', question_text: 'What did Dad do?', answer: 'He made a campfire.', options: ['He makes a campfire.', 'He make a campfire.', 'He made a campfire.', 'He rode a campfire.'] },
-    { id: -816, type: 'u8_choice', question_text: 'How was the zoo?', answer: 'It was boring.', options: ['It was boring.', 'They were boring.', 'It is boring.', 'It were boring.'] },
-    { id: -817, type: 'u8_choice', question_text: 'How were the dolphins?', answer: 'They were interesting.', options: ['It was interesting.', 'They was interesting.', 'They were interesting.', 'They are interesting.'] },
-    { id: -818, type: 'u8_choice', question_text: 'The aquarium was fun and made me want to learn more. How was it?', answer: 'It was interesting.', options: ['It was scary.', 'It was boring.', 'It was interesting.', 'They were exciting.'] },
-    { id: -819, type: 'u8_choice', question_text: 'The campsite was dark, and I felt afraid. How was it?', answer: 'It was scary.', options: ['It was scary.', 'It was exciting.', 'It was interesting.', 'They were boring.'] },
-    { id: -820, type: 'u8_choice', question_text: 'The horseback ride at the ranch was great fun. How was it?', answer: 'It was exciting.', options: ['It was boring.', 'It was exciting.', 'It was scary.', 'They were interesting.'] },
-    { id: -821, type: 'u8_choice', question_text: 'Choose the correct past tense: see → ___', answer: 'saw', options: ['seed', 'saw', 'seen', 'see'] },
-    { id: -822, type: 'u8_choice', question_text: 'Choose the correct past tense: feed → ___', answer: 'fed', options: ['feeded', 'fed', 'felt', 'feed'] },
-    { id: -823, type: 'u8_choice', question_text: 'Choose the correct past tense: explore → ___', answer: 'explored', options: ['exploreed', 'explored', 'explore', 'exploring'] },
-    { id: -824, type: 'u8_choice', question_text: 'Choose the correct past tense: sleep → ___', answer: 'slept', options: ['sleeped', 'slept', 'sleep', 'slapt'] }
-];
-
 // ── Supabase API ─────────────────────────────────
 
 async function fetchQuestions(mode, submode) {
-    if (mode === 'U8') return U8_QUESTIONS;
     let url;
     if (mode === 'grammar') {
         url = `${SUPABASE_URL}/rest/v1/questions?mode=eq.grammar&select=*`;
