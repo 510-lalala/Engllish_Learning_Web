@@ -667,6 +667,7 @@ let totalRound     = 0;
 let correctCount   = 0;
 let selectedOption = null;
 let questionMode   = 'choice';
+let isRetryMode    = false;
 
 const correctSound = new Audio('./sound/correct.mp3');
 const wrongSound   = new Audio('./sound/wrong.mp3');
@@ -798,6 +799,7 @@ async function startGame() {
     wrongRecords  = [];
     currentSessionId = null;
     xpThisRound   = 0;
+    isRetryMode   = false;
 
     const subLabel = u7SubMode ? ` — ${u7SubMode.charAt(0).toUpperCase()+u7SubMode.slice(1)}` : '';
     const modeLabel = appMode === 'U6' ? '📖 U6 單字' : appMode === 'U7' ? `🚌 U7 單字${subLabel}` : appMode === 'U8' ? '🏕️ U8 Going on a Trip' : '✏️ 文法練習';
@@ -1197,7 +1199,6 @@ async function finishGame() {
     stopTimer();
     const elapsed    = timerSeconds;
     const wrongCount = wrongRecords.length;
-    //if(isRetry)return;
     // 完成 session 紀錄
     await finalizeSession(currentSessionId, wrongCount, elapsed);
 
@@ -1205,12 +1206,18 @@ async function finishGame() {
     xpThisRound += 10;
     await addXP(currentStudent.id, 10, 'round_complete', currentSessionId);
 
-    // 更新最快紀錄
-    const { isNewRecord, bestSeconds } = await updateStudentTime(
-        currentStudent.id, appMode, elapsed
-    );
     const bestKey = (appMode === 'U6' || appMode === 'U7' || appMode === 'U8') ? 'best_vocab_seconds' : 'best_grammar_seconds';
-    currentStudent[bestKey] = bestSeconds;
+    const isOfficialComplete = !isRetryMode && correctCount === totalRound && currentPool.length === 0;
+    let isNewRecord = false;
+    let bestSeconds = currentStudent[bestKey] ?? null;
+
+    // 只有正式模式完整做完所有題目，才更新最快紀錄。
+    if (isOfficialComplete) {
+        const result = await updateStudentTime(currentStudent.id, appMode, elapsed);
+        isNewRecord = result.isNewRecord;
+        bestSeconds = result.bestSeconds;
+        currentStudent[bestKey] = bestSeconds;
+    }
 
     // 刷新紀錄獎勵 +20 XP
     if (isNewRecord) {
@@ -1408,6 +1415,7 @@ async function startRetryWrong(questionIds, sessionMode) {
     currentPool  = [...questions].sort(() => 0.5 - Math.random());
     correctCount = 0;
     wrongRecords = [];
+    isRetryMode  = true;
     currentSessionId = await createSession(currentStudent.id, sessionMode + '-retry');
 
     const modeLabel = appMode === 'U6' ? '📖 U6 錯題練習'
