@@ -1417,7 +1417,6 @@ async function startRetryWrong(questionIds, sessionMode) {
     wrongRecords = [];
     isRetryMode  = true;
     currentSessionId = await createSession(currentStudent.id, sessionMode + '-retry');
-
     const modeLabel = appMode === 'U6' ? '📖 U6 錯題練習'
                     : appMode === 'U7' ? `🚌 U7 錯題練習`
                     : appMode === 'U8' ? '🏕️ U8 錯題練習'
