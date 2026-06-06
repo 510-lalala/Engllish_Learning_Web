@@ -31,12 +31,13 @@
         .home-title   { font-size: 26px; font-weight: 700; color: #333; margin-bottom: 6px; }
         .home-sub     { font-size: 15px; color: #999; margin-bottom: 8px; }
         .home-student { font-size: 15px; color: #1cb0f6; font-weight: 600; margin-bottom: 20px; }
-        /* 三個並排按鈕 */
-        .mode-btn-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 0; }
+        /* 單元並排按鈕 */
+        .mode-btn-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 0; }
         .mode-btn     { display: block; width: 100%; padding: 18px 8px; border: none; border-radius: 16px; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; line-height: 1.4; }
         .mode-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
         .btn-u6vocab  { background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; }
         .btn-u7vocab  { background: linear-gradient(135deg, #f7971e, #ffd200); color: white; }
+        .btn-u8vocab  { background: linear-gradient(135deg, #7f7fd5, #86a8e7); color: white; }
         .btn-grammar  { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
         /* 喇叭按鈕（拼字題） */
         .speak-btn { background: none; border: 2px solid #1cb0f6; border-radius: 50%; width: 44px; height: 44px; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px; transition: background 0.15s; }
@@ -215,6 +216,7 @@
         <div class="mode-btn-row">
             <button class="mode-btn btn-u6vocab"  onclick="goSub('U6')">📖<br>U6<br>單字</button>
             <button class="mode-btn btn-u7vocab"  onclick="goSub('U7')">🚌<br>U7<br>單字</button>
+            <button class="mode-btn btn-u8vocab"  onclick="goSub('U8')">🏕️<br>U8<br>旅行</button>
             <button class="mode-btn btn-grammar"  onclick="goSub('grammar')">✏️<br>文法<br>練習</button>
         </div>
         <div style="display:flex;gap:10px;margin-top:12px;">
@@ -365,9 +367,38 @@ const headers = {
     'Authorization': 'Bearer ' + SUPABASE_KEY
 };
 
+// Unit 8 題目直接放在前端，開啟網站後即可練習。
+const U8_QUESTIONS = [
+    { id: -801, type: 'u8_spelling', question_text: '看一些動物', answer: 'see some animals' },
+    { id: -802, type: 'u8_spelling', question_text: '騎馬', answer: 'ride a horse' },
+    { id: -803, type: 'u8_spelling', question_text: '探索洞穴', answer: 'explore a cave' },
+    { id: -804, type: 'u8_spelling', question_text: '生營火', answer: 'make a campfire' },
+    { id: -805, type: 'u8_spelling', question_text: '睡在帳篷裡', answer: 'sleep in a tent' },
+    { id: -806, type: 'u8_spelling', question_text: '餵海豚', answer: 'feed a dolphin' },
+    { id: -807, type: 'u8_spelling', question_text: '烤棉花糖', answer: 'roast marshmallows' },
+    { id: -808, type: 'u8_spelling', question_text: '待在家', answer: 'stay at home' },
+    { id: -809, type: 'u8_choice', question_text: 'What did she do?', answer: 'She roasted marshmallows.', options: ['She roasted marshmallows.', 'She roast marshmallows.', 'She roasts marshmallows.', 'She is roasting marshmallows.'] },
+    { id: -810, type: 'u8_choice', question_text: 'What did he do?', answer: 'He slept in a tent.', options: ['He sleep in a tent.', 'He slept in a tent.', 'He sleeps in a tent.', 'He sleeping in a tent.'] },
+    { id: -811, type: 'u8_choice', question_text: 'What did they do?', answer: 'They stayed at home.', options: ['They stay at home.', 'They stayed at home.', 'They stays at home.', 'They are stay at home.'] },
+    { id: -812, type: 'u8_choice', question_text: 'What did Brian do on the beach?', answer: 'He rode a horse.', options: ['He ride a horse.', 'He rode a horse.', 'He rides a horse.', 'He made a horse.'] },
+    { id: -813, type: 'u8_choice', question_text: 'What did Alex and Brian do?', answer: 'They explored a cave.', options: ['They explore a cave.', 'They explored a cave.', 'They saw a cave.', 'They slept a cave.'] },
+    { id: -814, type: 'u8_choice', question_text: 'What did Emma do?', answer: 'She saw a dolphin and a whale.', options: ['She see a dolphin and a whale.', 'She saw a dolphin and a whale.', 'She fed a cave.', 'She rode a dolphin and a whale.'] },
+    { id: -815, type: 'u8_choice', question_text: 'What did Dad do?', answer: 'He made a campfire.', options: ['He makes a campfire.', 'He make a campfire.', 'He made a campfire.', 'He rode a campfire.'] },
+    { id: -816, type: 'u8_choice', question_text: 'How was the zoo?', answer: 'It was boring.', options: ['It was boring.', 'They were boring.', 'It is boring.', 'It were boring.'] },
+    { id: -817, type: 'u8_choice', question_text: 'How were the dolphins?', answer: 'They were interesting.', options: ['It was interesting.', 'They was interesting.', 'They were interesting.', 'They are interesting.'] },
+    { id: -818, type: 'u8_choice', question_text: 'The aquarium was fun and made me want to learn more. How was it?', answer: 'It was interesting.', options: ['It was scary.', 'It was boring.', 'It was interesting.', 'They were exciting.'] },
+    { id: -819, type: 'u8_choice', question_text: 'The campsite was dark, and I felt afraid. How was it?', answer: 'It was scary.', options: ['It was scary.', 'It was exciting.', 'It was interesting.', 'They were boring.'] },
+    { id: -820, type: 'u8_choice', question_text: 'The horseback ride at the ranch was great fun. How was it?', answer: 'It was exciting.', options: ['It was boring.', 'It was exciting.', 'It was scary.', 'They were interesting.'] },
+    { id: -821, type: 'u8_choice', question_text: 'Choose the correct past tense: see → ___', answer: 'saw', options: ['seed', 'saw', 'seen', 'see'] },
+    { id: -822, type: 'u8_choice', question_text: 'Choose the correct past tense: feed → ___', answer: 'fed', options: ['feeded', 'fed', 'felt', 'feed'] },
+    { id: -823, type: 'u8_choice', question_text: 'Choose the correct past tense: explore → ___', answer: 'explored', options: ['exploreed', 'explored', 'explore', 'exploring'] },
+    { id: -824, type: 'u8_choice', question_text: 'Choose the correct past tense: sleep → ___', answer: 'slept', options: ['sleeped', 'slept', 'sleep', 'slapt'] }
+];
+
 // ── Supabase API ─────────────────────────────────
 
 async function fetchQuestions(mode, submode) {
+    if (mode === 'U8') return U8_QUESTIONS;
     let url;
     if (mode === 'grammar') {
         url = `${SUPABASE_URL}/rest/v1/questions?mode=eq.grammar&select=*`;
@@ -489,8 +520,8 @@ async function updateStudentTime(studentId, mode, seconds) {
     if (!data.length) return { isNewRecord: false, bestSeconds: null };
 
     const row     = data[0];
-    // U6 和 U7 共用 vocab 欄位（都算單字模式）
-    const isVocab    = (mode === 'U6' || mode === 'U7');
+    // U6、U7 和 U8 共用 vocab 欄位（都算單字模式）
+    const isVocab    = (mode === 'U6' || mode === 'U7' || mode === 'U8');
     const bestKey    = isVocab ? 'best_vocab_seconds'  : 'best_grammar_seconds';
     const lastKey    = isVocab ? 'last_vocab_seconds'  : 'last_grammar_seconds';
     const currentBest = row[bestKey];
@@ -719,6 +750,12 @@ function goSub(mode) {
         document.getElementById('sub-desc').innerText  = '選擇練習方式：Matching、Spelling 或 Mix（含發音題）。';
         document.getElementById('sub-tags').innerHTML  =
             '<span class="tag">train</span><span class="tag">subway</span><span class="tag">ferry</span><span class="tag">taxi</span><span class="tag">helicopter</span><span class="tag">bicycle</span>';
+    } else if (mode === 'U8') {
+        document.getElementById('sub-icon').innerText  = '🏕️';
+        document.getElementById('sub-title').innerText = 'U8 Going on a Trip';
+        document.getElementById('sub-desc').innerText  = '旅行活動、過去式與 How was / How were 句型混合練習。';
+        document.getElementById('sub-tags').innerHTML  =
+            '<span class="tag">旅行活動</span><span class="tag">過去式</span><span class="tag">感受形容詞</span><span class="tag">問答句型</span>';
     } else {
         document.getElementById('sub-icon').innerText  = '✏️';
         document.getElementById('sub-title').innerText = '文法練習';
@@ -749,15 +786,21 @@ async function startGame() {
         return;
     }
 
-    totalRound   = appMode === 'grammar' ? 10 : 8;
-    currentPool  = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, totalRound);
+    totalRound = appMode === 'grammar' ? 10 : 8;
+    if (appMode === 'U8') {
+        const spelling = allQuestions.filter(q => q.type === 'u8_spelling').sort(() => 0.5 - Math.random()).slice(0, 4);
+        const choice   = allQuestions.filter(q => q.type === 'u8_choice').sort(() => 0.5 - Math.random()).slice(0, 4);
+        currentPool = [...spelling, ...choice].sort(() => 0.5 - Math.random());
+    } else {
+        currentPool = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, totalRound);
+    }
     correctCount  = 0;
     wrongRecords  = [];
     currentSessionId = null;
     xpThisRound   = 0;
 
     const subLabel = u7SubMode ? ` — ${u7SubMode.charAt(0).toUpperCase()+u7SubMode.slice(1)}` : '';
-    const modeLabel = appMode === 'U6' ? '📖 U6 單字' : appMode === 'U7' ? `🚌 U7 單字${subLabel}` : '✏️ 文法練習';
+    const modeLabel = appMode === 'U6' ? '📖 U6 單字' : appMode === 'U7' ? `🚌 U7 單字${subLabel}` : appMode === 'U8' ? '🏕️ U8 Going on a Trip' : '✏️ 文法練習';
     document.getElementById('quiz-mode-label').innerText = modeLabel;
     document.getElementById('progress-fill').style.width = '0%';
     document.getElementById('game-zone').style.display   = 'block';
@@ -797,7 +840,9 @@ function loadQuestion() {
     document.getElementById('input-zone').style.display  = 'none';
     selectedOption = null;
 
-    if (appMode === 'grammar') {
+    if (appMode === 'U8') {
+        loadU8Question();
+    } else if (appMode === 'grammar') {
         loadGrammarQuestion();
     } else if (appMode === 'U7') {
         const type = currentPool[0].type;
@@ -807,6 +852,25 @@ function loadQuestion() {
         else                           loadVocabQuestion();
     } else {
         loadVocabQuestion();
+    }
+}
+
+// ── Unit 8：旅行活動、過去式與句型 ───────────────────
+function loadU8Question() {
+    const q = currentPool[0];
+    if (q.type === 'u8_spelling') {
+        questionMode = 'u8_spelling';
+        setTypeBadge('U8 單字拼寫', 'badge-spelling');
+        document.getElementById('question-type-text').innerText = '依照中文提示，輸入英文片語';
+        document.getElementById('sentence-hint').innerHTML =
+            `<span class="highlight">${q.question_text}</span>`;
+        showInput();
+    } else {
+        questionMode = 'u8_choice';
+        setTypeBadge('U8 句型與過去式', 'badge-grammar');
+        document.getElementById('question-type-text').innerText = '選出最正確的答案';
+        document.getElementById('sentence-hint').innerHTML = q.question_text;
+        renderOptions(q.options, q.answer, true);
     }
 }
 
@@ -1056,6 +1120,11 @@ document.getElementById('submit-btn').onclick = async function() {
         isCorrect      = normalize(userAns) === normalize(q.answer);
         correctDisplay = q.answer;
     }
+    else if (q.type === 'u8_spelling') {
+        const normalize = s => s.toLowerCase().replace(/\s+/g, ' ').trim();
+        isCorrect      = normalize(userAns) === normalize(q.answer);
+        correctDisplay = q.answer;
+    }
     else if (questionMode === 'choice') {
         isCorrect      = userAns === q.answer.toLowerCase();
         correctDisplay = q.answer;
@@ -1076,7 +1145,7 @@ document.getElementById('submit-btn').onclick = async function() {
     }
 
     // 儲存記錄
-    const recordMode = (appMode === 'U6' || appMode === 'U7') ? 'vocab' : 'grammar';
+    const recordMode = (appMode === 'U6' || appMode === 'U7' || appMode === 'U8') ? 'vocab' : 'grammar';
     saveRecord(currentStudent.id, q.id, recordMode, isCorrect,
         selectedOption || '', correctDisplay);
 
@@ -1139,7 +1208,7 @@ async function finishGame() {
     const { isNewRecord, bestSeconds } = await updateStudentTime(
         currentStudent.id, appMode, elapsed
     );
-    const bestKey = (appMode === 'U6' || appMode === 'U7') ? 'best_vocab_seconds' : 'best_grammar_seconds';
+    const bestKey = (appMode === 'U6' || appMode === 'U7' || appMode === 'U8') ? 'best_vocab_seconds' : 'best_grammar_seconds';
     currentStudent[bestKey] = bestSeconds;
 
     // 刷新紀錄獎勵 +20 XP
@@ -1229,6 +1298,7 @@ function renderHistory(sessions) {
     const modeNames = {
         'U6': '📖 U6 單字', 'U7-matching': '🎯 U7 Matching',
         'U7-spelling': '🔤 U7 Spelling', 'U7-mix': '🎲 U7 Mix',
+        'U8': '🏕️ U8 Going on a Trip',
         'grammar': '✏️ 文法'
     };
 
@@ -1341,6 +1411,7 @@ async function startRetryWrong(questionIds, sessionMode) {
 
     const modeLabel = appMode === 'U6' ? '📖 U6 錯題練習'
                     : appMode === 'U7' ? `🚌 U7 錯題練習`
+                    : appMode === 'U8' ? '🏕️ U8 錯題練習'
                     : '✏️ 文法錯題練習';
     document.getElementById('quiz-mode-label').innerText = modeLabel;
     document.getElementById('progress-fill').style.width = '0%';
