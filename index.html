@@ -877,7 +877,8 @@ function loadU8Question() {
 // ── 單字題 ──────────────────────────────────────────
 function loadVocabQuestion() {
     const q      = currentPool[0];
-    const modes  = ['choice', 'spelling', 'sentence'];
+    // U7 題目沒有 U6 句子填空所需的 grp / sentence_noun 欄位。
+    const modes  = appMode === 'U7' ? ['choice', 'spelling'] : ['choice', 'spelling', 'sentence'];
     questionMode = modes[Math.floor(Math.random() * modes.length)];
 
     document.getElementById('main-image').src           = q.image_path;
@@ -1140,8 +1141,8 @@ document.getElementById('submit-btn').onclick = async function() {
     }
     else {
         const target   = (q.grp === 'symptom') ? q.noun : q.sentence_noun;
-        isCorrect      = userAns === target.toLowerCase();
-        correctDisplay = target;
+        isCorrect      = Boolean(target) && userAns === target.toLowerCase();
+        correctDisplay = target || q.answer;
     }
 
     // 儲存記錄
