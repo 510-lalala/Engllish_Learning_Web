@@ -31,12 +31,13 @@
         .home-title   { font-size: 26px; font-weight: 700; color: #333; margin-bottom: 6px; }
         .home-sub     { font-size: 15px; color: #999; margin-bottom: 8px; }
         .home-student { font-size: 15px; color: #1cb0f6; font-weight: 600; margin-bottom: 20px; }
-        /* 三個並排按鈕 */
-        .mode-btn-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 0; }
+        /* 單元並排按鈕 */
+        .mode-btn-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 0; }
         .mode-btn     { display: block; width: 100%; padding: 18px 8px; border: none; border-radius: 16px; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; line-height: 1.4; }
         .mode-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
         .btn-u6vocab  { background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; }
         .btn-u7vocab  { background: linear-gradient(135deg, #f7971e, #ffd200); color: white; }
+        .btn-u8vocab  { background: linear-gradient(135deg, #7f7fd5, #86a8e7); color: white; }
         .btn-grammar  { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
         /* 喇叭按鈕（拼字題） */
         .speak-btn { background: none; border: 2px solid #1cb0f6; border-radius: 50%; width: 44px; height: 44px; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px; transition: background 0.15s; }
@@ -215,6 +216,7 @@
         <div class="mode-btn-row">
             <button class="mode-btn btn-u6vocab"  onclick="goSub('U6')">📖<br>U6<br>單字</button>
             <button class="mode-btn btn-u7vocab"  onclick="goSub('U7')">🚌<br>U7<br>單字</button>
+            <button class="mode-btn btn-u8vocab"  onclick="goSub('U8')">🏕️<br>U8<br>旅行</button>
             <button class="mode-btn btn-grammar"  onclick="goSub('grammar')">✏️<br>文法<br>練習</button>
         </div>
         <div style="display:flex;gap:10px;margin-top:12px;">
@@ -489,8 +491,8 @@ async function updateStudentTime(studentId, mode, seconds) {
     if (!data.length) return { isNewRecord: false, bestSeconds: null };
 
     const row     = data[0];
-    // U6 和 U7 共用 vocab 欄位（都算單字模式）
-    const isVocab    = (mode === 'U6' || mode === 'U7');
+    // U6、U7 和 U8 共用 vocab 欄位（都算單字模式）
+    const isVocab    = (mode === 'U6' || mode === 'U7' || mode === 'U8');
     const bestKey    = isVocab ? 'best_vocab_seconds'  : 'best_grammar_seconds';
     const lastKey    = isVocab ? 'last_vocab_seconds'  : 'last_grammar_seconds';
     const currentBest = row[bestKey];
@@ -636,6 +638,7 @@ let totalRound     = 0;
 let correctCount   = 0;
 let selectedOption = null;
 let questionMode   = 'choice';
+let isRetryMode    = false;
 
 const correctSound = new Audio('./sound/correct.mp3');
 const wrongSound   = new Audio('./sound/wrong.mp3');
@@ -719,6 +722,12 @@ function goSub(mode) {
         document.getElementById('sub-desc').innerText  = '選擇練習方式：Matching、Spelling 或 Mix（含發音題）。';
         document.getElementById('sub-tags').innerHTML  =
             '<span class="tag">train</span><span class="tag">subway</span><span class="tag">ferry</span><span class="tag">taxi</span><span class="tag">helicopter</span><span class="tag">bicycle</span>';
+    } else if (mode === 'U8') {
+        document.getElementById('sub-icon').innerText  = '🏕️';
+        document.getElementById('sub-title').innerText = 'U8 Going on a Trip';
+        document.getElementById('sub-desc').innerText  = '旅行活動、過去式與 How was / How were 句型混合練習。';
+        document.getElementById('sub-tags').innerHTML  =
+            '<span class="tag">旅行活動</span><span class="tag">過去式</span><span class="tag">感受形容詞</span><span class="tag">問答句型</span>';
     } else {
         document.getElementById('sub-icon').innerText  = '✏️';
         document.getElementById('sub-title').innerText = '文法練習';
@@ -749,15 +758,22 @@ async function startGame() {
         return;
     }
 
-    totalRound   = appMode === 'grammar' ? 10 : 8;
-    currentPool  = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, totalRound);
+    totalRound = appMode === 'grammar' ? 10 : 8;
+    if (appMode === 'U8') {
+        const spelling = allQuestions.filter(q => q.type === 'u8_spelling').sort(() => 0.5 - Math.random()).slice(0, 4);
+        const choice   = allQuestions.filter(q => q.type === 'u8_choice').sort(() => 0.5 - Math.random()).slice(0, 4);
+        currentPool = [...spelling, ...choice].sort(() => 0.5 - Math.random());
+    } else {
+        currentPool = [...allQuestions].sort(() => 0.5 - Math.random()).slice(0, totalRound);
+    }
     correctCount  = 0;
     wrongRecords  = [];
     currentSessionId = null;
     xpThisRound   = 0;
+    isRetryMode   = false;
 
     const subLabel = u7SubMode ? ` — ${u7SubMode.charAt(0).toUpperCase()+u7SubMode.slice(1)}` : '';
-    const modeLabel = appMode === 'U6' ? '📖 U6 單字' : appMode === 'U7' ? `🚌 U7 單字${subLabel}` : '✏️ 文法練習';
+    const modeLabel = appMode === 'U6' ? '📖 U6 單字' : appMode === 'U7' ? `🚌 U7 單字${subLabel}` : appMode === 'U8' ? '🏕️ U8 Going on a Trip' : '✏️ 文法練習';
     document.getElementById('quiz-mode-label').innerText = modeLabel;
     document.getElementById('progress-fill').style.width = '0%';
     document.getElementById('game-zone').style.display   = 'block';
@@ -797,7 +813,9 @@ function loadQuestion() {
     document.getElementById('input-zone').style.display  = 'none';
     selectedOption = null;
 
-    if (appMode === 'grammar') {
+    if (appMode === 'U8') {
+        loadU8Question();
+    } else if (appMode === 'grammar') {
         loadGrammarQuestion();
     } else if (appMode === 'U7') {
         const type = currentPool[0].type;
@@ -810,10 +828,30 @@ function loadQuestion() {
     }
 }
 
+// ── Unit 8：旅行活動、過去式與句型 ───────────────────
+function loadU8Question() {
+    const q = currentPool[0];
+    if (q.type === 'u8_spelling') {
+        questionMode = 'u8_spelling';
+        setTypeBadge('U8 單字拼寫', 'badge-spelling');
+        document.getElementById('question-type-text').innerText = '依照中文提示，輸入英文片語';
+        document.getElementById('sentence-hint').innerHTML =
+            `<span class="highlight">${q.question_text}</span>`;
+        showInput();
+    } else {
+        questionMode = 'u8_choice';
+        setTypeBadge('U8 句型與過去式', 'badge-grammar');
+        document.getElementById('question-type-text').innerText = '選出最正確的答案';
+        document.getElementById('sentence-hint').innerHTML = q.question_text;
+        renderOptions(q.options, q.answer, true);
+    }
+}
+
 // ── 單字題 ──────────────────────────────────────────
 function loadVocabQuestion() {
     const q      = currentPool[0];
-    const modes  = ['choice', 'spelling', 'sentence'];
+    // U7 題目沒有 U6 句子填空所需的 grp / sentence_noun 欄位。
+    const modes  = appMode === 'U7' ? ['choice', 'spelling'] : ['choice', 'spelling', 'sentence'];
     questionMode = modes[Math.floor(Math.random() * modes.length)];
 
     document.getElementById('main-image').src           = q.image_path;
@@ -1056,7 +1094,12 @@ document.getElementById('submit-btn').onclick = async function() {
         isCorrect      = normalize(userAns) === normalize(q.answer);
         correctDisplay = q.answer;
     }
-    else if (questionMode === 'choice') {
+    else if (q.type === 'u8_spelling') {
+        const normalize = s => s.toLowerCase().replace(/\s+/g, ' ').trim();
+        isCorrect      = normalize(userAns) === normalize(q.answer);
+        correctDisplay = q.answer;
+    }
+    else if (questionMode === 'choice' || q.type === 'u8_choice') {
         isCorrect      = userAns === q.answer.toLowerCase();
         correctDisplay = q.answer;
         document.querySelectorAll('.opt').forEach(b => {
@@ -1071,12 +1114,12 @@ document.getElementById('submit-btn').onclick = async function() {
     }
     else {
         const target   = (q.grp === 'symptom') ? q.noun : q.sentence_noun;
-        isCorrect      = userAns === target.toLowerCase();
-        correctDisplay = target;
+        isCorrect      = Boolean(target) && userAns === target.toLowerCase();
+        correctDisplay = target || q.answer;
     }
 
     // 儲存記錄
-    const recordMode = (appMode === 'U6' || appMode === 'U7') ? 'vocab' : 'grammar';
+    const recordMode = (appMode === 'U6' || appMode === 'U7' || appMode === 'U8') ? 'vocab' : 'grammar';
     saveRecord(currentStudent.id, q.id, recordMode, isCorrect,
         selectedOption || '', correctDisplay);
 
@@ -1127,8 +1170,6 @@ async function finishGame() {
     stopTimer();
     const elapsed    = timerSeconds;
     const wrongCount = wrongRecords.length;
-    if(isRetryMode)return;
-
     // 完成 session 紀錄
     await finalizeSession(currentSessionId, wrongCount, elapsed);
 
@@ -1136,12 +1177,18 @@ async function finishGame() {
     xpThisRound += 10;
     await addXP(currentStudent.id, 10, 'round_complete', currentSessionId);
 
-    // 更新最快紀錄
-    const { isNewRecord, bestSeconds } = await updateStudentTime(
-        currentStudent.id, appMode, elapsed
-    );
-    const bestKey = (appMode === 'U6' || appMode === 'U7') ? 'best_vocab_seconds' : 'best_grammar_seconds';
-    currentStudent[bestKey] = bestSeconds;
+    const bestKey = (appMode === 'U6' || appMode === 'U7' || appMode === 'U8') ? 'best_vocab_seconds' : 'best_grammar_seconds';
+    const isOfficialComplete = !isRetryMode && correctCount === totalRound && currentPool.length === 0;
+    let isNewRecord = false;
+    let bestSeconds = currentStudent[bestKey] ?? null;
+
+    // 只有正式模式完整做完所有題目，才更新最快紀錄。
+    if (isOfficialComplete) {
+        const result = await updateStudentTime(currentStudent.id, appMode, elapsed);
+        isNewRecord = result.isNewRecord;
+        bestSeconds = result.bestSeconds;
+        currentStudent[bestKey] = bestSeconds;
+    }
 
     // 刷新紀錄獎勵 +20 XP
     if (isNewRecord) {
@@ -1230,6 +1277,7 @@ function renderHistory(sessions) {
     const modeNames = {
         'U6': '📖 U6 單字', 'U7-matching': '🎯 U7 Matching',
         'U7-spelling': '🔤 U7 Spelling', 'U7-mix': '🎲 U7 Mix',
+        'U8': '🏕️ U8 Going on a Trip',
         'grammar': '✏️ 文法'
     };
 
@@ -1305,7 +1353,6 @@ async function startRetryWrong(questionIds, sessionMode) {
     if (!questionIds.length) return;
     showScreen('loading-screen');
 
-    isRetryMode = true;
     // 撈這些題目的完整資料
     const ids = questionIds.join(',');
     const res = await fetch(
@@ -1339,10 +1386,11 @@ async function startRetryWrong(questionIds, sessionMode) {
     currentPool  = [...questions].sort(() => 0.5 - Math.random());
     correctCount = 0;
     wrongRecords = [];
+    isRetryMode  = true;
     currentSessionId = await createSession(currentStudent.id, sessionMode + '-retry');
-
     const modeLabel = appMode === 'U6' ? '📖 U6 錯題練習'
                     : appMode === 'U7' ? `🚌 U7 錯題練習`
+                    : appMode === 'U8' ? '🏕️ U8 錯題練習'
                     : '✏️ 文法錯題練習';
     document.getElementById('quiz-mode-label').innerText = modeLabel;
     document.getElementById('progress-fill').style.width = '0%';
@@ -1352,7 +1400,7 @@ async function startRetryWrong(questionIds, sessionMode) {
     document.getElementById('quiz-back-btn').onclick = () => { stopTimer(); goHistory(); };
 
     showScreen('quiz-container');
-    //startTimer();
+    startTimer();
     loadQuestion();
 }
 
